@@ -1,6 +1,6 @@
 {
   "version": "1.1",
-  "lastUpdated": "2026-07-31T01:02:20Z",
+  "lastUpdated": "2026-07-31T01:22:28Z",
   "phases": {
     "phase_1_prd_architecture": { "status": "COMPLETE", "fileCount": 3 },
     "phase_2_database": { "status": "COMPLETE", "fileCount": 2 },
@@ -11,30 +11,23 @@
     "phase_7_seed_readme": { "status": "COMPLETE", "fileCount": 4 },
     "phase_8a_editor_shell": { "status": "COMPLETE", "fileCount": 18 },
     "phase_8b_editor_logic": { "status": "COMPLETE", "fileCount": 13 },
-    "phase_8c_workers_ai": {
+    "phase_8c_workers_ai": { "status": "COMPLETE", "fileCount": 17 },
+    "phase_9_1a_ffmpeg_core": { "status": "COMPLETE", "fileCount": 10 },
+    "phase_9_1b_media_analysis": {
       "status": "COMPLETE",
-      "fileCount": 17,
+      "fileCount": 8,
       "files": [
-        "apps/worker/package.json",
-        "apps/worker/tsconfig.json",
-        "apps/worker/src/index.ts",
-        "apps/worker/src/config/redis.ts",
-        "apps/worker/src/workers/ai.worker.ts",
-        "apps/worker/src/workers/media.worker.ts",
-        "apps/worker/src/workers/system.worker.ts",
-        "apps/api/src/modules/ai/ai.module.ts",
-        "apps/api/src/modules/ai/ai.controller.ts",
-        "apps/api/src/modules/ai/ai.routes.ts",
-        "apps/api/src/modules/ai/services/script.generator.ts",
-        "apps/api/src/modules/ai/services/planner.generator.ts",
-        "apps/api/src/modules/ai/services/subtitle.generator.ts",
-        "apps/api/src/modules/jobs/jobs.service.ts",
-        "apps/api/src/modules/jobs/jobs.events.ts",
-        "apps/api/src/modules/jobs/jobs.controller.ts",
-        "apps/api/src/modules/jobs/jobs.routes.ts"
+        "packages/ffmpeg-core/src/managers/metadata-cache.manager.ts",
+        "packages/ffmpeg-core/src/services/file-validator.service.ts",
+        "packages/ffmpeg-core/src/services/video-analyzer.service.ts",
+        "packages/ffmpeg-core/src/services/audio-analyzer.service.ts",
+        "packages/ffmpeg-core/src/services/image-analyzer.service.ts",
+        "packages/ffmpeg-core/src/services/quality-analyzer.service.ts",
+        "packages/ffmpeg-core/src/services/thumbnail.service.ts",
+        "packages/ffmpeg-core/src/services/waveform.service.ts"
       ]
     },
-    "phase_9_backend_modules": {
+    "phase_9_1c_backend_modules": {
       "status": "NOT_STARTED",
       "description": "Projects/Media/Templates CRUD API, Timeline API"
     },
@@ -43,8 +36,8 @@
       "description": "Docker, CI/CD, deployment configs"
     }
   },
-  "currentPhase": "phase_8c_workers_ai",
+  "currentPhase": "phase_9_1b_media_analysis",
   "phaseStatus": "COMPLETE",
-  "totalFiles": 213,
-  "lastCompletedFile": "apps/api/src/modules/jobs/jobs.routes.ts"
+  "totalFiles": 231,
+  "lastCompletedFile": "packages/ffmpeg-core/src/services/waveform.service.ts"
 }

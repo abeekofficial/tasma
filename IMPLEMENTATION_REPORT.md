@@ -13,44 +13,37 @@
 | Phase 7 — Seed & Package Config | ✅ Complete | 4 | seed.ts, types pkg, README |
 | Phase 8A — Video Editor Shell | ✅ Complete | 18 | Full editor UI with panels, timeline, preview |
 | Phase 8B — Editor Logic | ✅ Complete | 13 | Zustand, Timeline interactions, Magnetic snap, virtual rendering |
-| **Phase 8C — Worker & AI** | **✅ Complete** | **17** | **BullMQ Worker App, AI Module, Jobs Module** |
-| Phase 9 — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
+| Phase 8C — Worker & AI | ✅ Complete | 17 | BullMQ Worker App, AI Module, Jobs Module |
+| Phase 9.1A — FFmpeg Core | ✅ Complete | 10 | `@tasma/ffmpeg-core` Workspace Library |
+| **Phase 9.1B — Media Analysis** | **✅ Complete** | **8** | **Video/Audio/Image/Quality Analyzers & Generators** |
+| Phase 9.1C — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 213 files
+## Current File Count: 231 files
 
-## Phase 8C Deliverables (Worker & AI)
+## Phase 9.1B Deliverables (Media Analysis Engine)
 
-### Worker Application (`apps/worker`)
+### Core Analyzers
 | File | Purpose |
 |------|---------|
-| `package.json` | Dedicated worker package dependencies (BullMQ, ioredis). |
-| `tsconfig.json` | Dedicated TypeScript configuration for the worker. |
-| `src/index.ts` | Entry point, health check server, graceful shutdown handler. |
-| `src/config/redis.ts` | Shared Redis connection pool. |
-| `src/workers/ai.worker.ts` | AI jobs processor (script, subtitles). |
-| `src/workers/media.worker.ts` | Media jobs processor (thumbnails, metadata). |
-| `src/workers/system.worker.ts` | System jobs processor (cache cleanup, autosave). |
+| `video-analyzer.service.ts` | Deep video metadata extraction (VFR, Pixel Format, Color Range, HDR). |
+| `audio-analyzer.service.ts` | Audio stream evaluation utilizing FFmpeg `volumedetect` and `silencedetect` filters to compute Peaks, LUFS, and silent intervals. |
+| `image-analyzer.service.ts` | Static & animated image metadata parsing (Transparency/Alpha, Color Profiles, Aspect Ratios). |
+| `quality-analyzer.service.ts` | Structure for estimating blur and visual quality using FFmpeg filter graphs (`blurdetect`, `vmaf`). |
 
-### AI API Module (`apps/api/src/modules/ai`)
+### Media Generators
 | File | Purpose |
 |------|---------|
-| `ai.module.ts` | Unified provider abstraction (OpenAI, Gemini, Anthropic) using Vercel AI SDK. |
-| `ai.controller.ts` | Express SSE stream endpoints for AI generation. |
-| `ai.routes.ts` | Express routing for the AI module. |
-| `services/script.generator.ts` | Viral Shorts/TikTok script generator logic. |
-| `services/planner.generator.ts` | Ranking video JSON planner generator. |
-| `services/subtitle.generator.ts` | Subtitle translation streaming service. |
+| `thumbnail.service.ts` | API for generating precise poster frames, array of timeline thumbnails, or continuous sprite sheets. |
+| `waveform.service.ts` | Service designed to extract PCM data from audio streams and compute raw peak JSON arrays for optimized frontend canvas rendering. |
 
-### Jobs API Module (`apps/api/src/modules/jobs`)
+### Infrastructure
 | File | Purpose |
 |------|---------|
-| `jobs.service.ts` | Interface to BullMQ; handles enqueuing jobs with priorities and retries. |
-| `jobs.events.ts` | Pub/sub layer that bridges BullMQ QueueEvents to an API EventEmitter. |
-| `jobs.controller.ts` | Express endpoints for checking job status and cancelling jobs. |
-| `jobs.routes.ts` | Express routing for the Jobs module. |
+| `file-validator.service.ts` | Pre-processing gateway that explicitly rejects corrupted files, unsupported codecs, and enforces maximum upload byte limits. |
+| `metadata-cache.manager.ts` | In-memory caching layer with TTL ensuring identical files aren't repeatedly analyzed by expensive FFmpeg probes. |
+| `types/index.ts` | Extensively updated to support the deeply nested analysis structures. |
 
 ### Architecture Highlights
-- **Distributed Processing:** AI generation and media processing have been fully decoupled from the main API process via BullMQ to prevent event-loop blocking.
-- **Provider Agnostic:** The `ai.module.ts` implementation allows the platform to seamlessly switch between Gemini, OpenAI, and Anthropic depending on API key availability and cost requirements.
-- **Real-time Prepared:** The `jobs.events.ts` module uses a local EventEmitter that acts as the perfect drop-in point for a future WebSocket gateway to stream progress bars back to the frontend.
+- **Performance Optimized:** Offloading specialized extraction logic (like Waveforms and Quality Metrics) into their own services ensures the main `MediaAnalyzer` remains blazing fast for lightweight uploads.
+- **Fail-Safe Processing:** `FileValidatorService` uses early-termination probes to aggressively reject corrupted data chunks, preventing infinite loops or memory leaks inside the FFmpeg execution wrappers.

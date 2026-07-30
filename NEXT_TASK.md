@@ -1,12 +1,12 @@
 ## Next Task
 
-**Phase 9 — Backend CRUD Modules**
+**Phase 9.1C — Backend CRUD Modules**
 
 ### Resume Point
-Phase 8C (Worker Service & AI Module) is fully complete (17 files, 213 total).
-The `apps/worker` application is configured with BullMQ, and the main API now has `ai` and `jobs` modules with proper routing, controllers, and services.
+Phase 9.1B (Media Analysis Engine) is fully complete (8 files added, 231 total).
+The `@tasma/ffmpeg-core` package now features advanced Video, Audio, Image, and Quality analysis services, alongside Thumbnail and Waveform generators with in-memory caching and strict file validation.
 
-### Phase 9 — Backend CRUD Modules
+### Phase 9.1C — Backend CRUD Modules
 - `apps/api/src/modules/projects/projects.service.ts`
 - `apps/api/src/modules/projects/projects.controller.ts`
 - `apps/api/src/modules/projects/projects.routes.ts`
@@ -25,14 +25,8 @@ The `apps/worker` application is configured with BullMQ, and the main API now ha
 - `apps/api/src/modules/timeline/timeline.routes.ts`
 - `apps/api/src/modules/timeline/timeline.validators.ts`
 
-### Phase 10 — DevOps
-- Dockerfiles for api, web, and worker
-- Docker Compose for local dev (postgres, redis, apps)
-- CI/CD workflows
-- Deployment configurations
-
 ### Last Completed File
-`apps/api/src/modules/jobs/jobs.routes.ts`
+`packages/ffmpeg-core/src/services/waveform.service.ts`
 
 ### Do Not Regenerate
-Everything in phases 1-8C (213 files already complete).
+Everything in phases 1-9.1B (231 files already complete).
