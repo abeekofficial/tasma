@@ -17,34 +17,32 @@
 | Phase 9.1A — FFmpeg Core | ✅ Complete | 10 | `@tasma/ffmpeg-core` Workspace Library |
 | Phase 9.1B — Media Analysis | ✅ Complete | 8 | Video/Audio/Image/Quality Analyzers & Generators |
 | Phase 9.1C — Video Processing | ✅ Complete | 7 | Pipeline Builder, Complex Filter Graphs, Operations |
-| **Phase 9.1D — Audio Processing** | **✅ Complete** | **4** | **EQ, Comp, Voice Enhancements, A/V Sync** |
-| Phase 9.1E — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
+| Phase 9.1D — Audio Processing | ✅ Complete | 4 | EQ, Comp, Voice Enhancements, A/V Sync |
+| **Phase 9.1E — Performance Engine** | **✅ Complete** | **4** | **GPU Detection, Codec Routing, Benchmarks, Caching** |
+| Phase 9.1F — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 242 files
+## Current File Count: 246 files
 
-## Phase 9.1D Deliverables (Audio Processing Engine)
+## Phase 9.1E Deliverables (GPU Acceleration & Performance Engine)
 
-### Core Audio Adjustments
+### Hardware & Codec Enhancements
 | File | Purpose |
 |------|---------|
-| `audio.operations.ts` | Base operations: trimming (`atrim`), playback speed mapping (`atempo`), exact MS delay (`adelay`), volume, multi-track crossfades (`acrossfade`), and strict EBU R128 Loudness Normalization. |
+| `hardware.manager.ts` | Expanded to detect `cuda` alongside QSV, NVENC, and VideoToolbox. Added a `handleGpuFailure` method to automatically quarantine unstable GPUs and force software fallbacks on subsequent jobs. |
+| `codec.manager.ts` | Upgraded to feature a fully-fledged `DecoderManager`. It analyzes input codecs and correctly maps hardware decoder flags (e.g., `-hwaccel cuvid -c:v h264_cuvid`) to dramatically reduce CPU load. |
 
-### Audio Effects & Filtering
+### Performance Orchestration
 | File | Purpose |
 |------|---------|
-| `audio-filter.operations.ts` | Specialized studio tools outputting FFmpeg commands for Equalization (`anequalizer`), Compression, limiters, noise gates, and High/Low pass filtering targeting exact frequencies. |
+| `resource.monitor.ts` | Polls the OS utilizing standard Node modules for CPU/RAM, and gracefully shells out to `nvidia-smi` to monitor GPU utilization without crashing on incompatible hardware. |
+| `benchmark.service.ts` | Capable of spinning up a synthetic 1-second libx264 encode/decode test to objectively score the host machine's processing throughput. |
+| `performance.engine.ts` | The core orchestrator orchestrator utilizing `ResourceMonitor` to enforce strict concurrency limits via a token-based locking queue. Prevents the worker from spawning FFmpeg instances if memory or CPU thresholds are breached. |
 
-### Voice Enhancements
+### Advanced Caching
 | File | Purpose |
 |------|---------|
-| `voice.operations.ts` | Logic mapped for background noise reduction (`afftdn`), automatic silent segment detection & removal (`silenceremove`), and vocal bandpass enhancements. |
-
-### Synchronization
-| File | Purpose |
-|------|---------|
-| `sync.operations.ts` | Resolves A/V drift when combining multiple disparate clips by providing `aresample=async=1` options and negative offset mappings via `-itsoffset`. |
+| `frame-cache.manager.ts` | Implemented a dedicated LRU cache restricted to a strict 500MB memory ceiling. This safely buffers decoded frame previews for ultra-fast timeline scrubbing without causing OOM crashes. |
 
 ### Architecture Highlights
-- **Unified Pipeline Extension:** Rather than creating a separate audio pipeline, we seamlessly extended the existing fluent `PipelineBuilder`. Audio commands (like `.equalize()` or `.adjustVolume()`) simply route dynamically to the `[0:a]` internal tracking graph, meaning developers can construct an entire A/V render in a single chained call.
-- **Strict Parameter Safety:** The `Zod` typings defined in Phase 9.1C were rigorously extended in Phase 9.1D. Now, sending an impossible compression ratio or illegal equalization frequency to the builder will fail instantly with a structured Type error, long before FFmpeg is executed.
+- **Pipeline Integration:** The `PipelineBuilder` (from Phase 9.1C) was successfully retrofitted to automatically query the new `CodecManager` logic when `.addInput()` is called. It now inherently injects hardware decoding flags at the very start of the FFmpeg command execution chain, yielding massive performance gains with zero extra configuration from the developers using the pipeline.

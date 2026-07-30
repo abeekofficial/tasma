@@ -1,14 +1,51 @@
 import { CodecSupport, HardwareAcceleration } from '../types';
 
+export interface DecoderConfig {
+  hwaccel?: string;
+  codec?: string;
+}
+
 export class CodecManager {
+  /**
+   * Determines the optimal video decoder config based on the input codec and available hardware.
+   */
+  public static getOptimalVideoDecoder(inputCodec: string, hardware: HardwareAcceleration[]): DecoderConfig {
+    const isCuda = hardware.includes('cuda' as HardwareAcceleration) || hardware.includes('nvenc' as HardwareAcceleration);
+    const isQsv = hardware.includes('qsv' as HardwareAcceleration);
+    const isAmf = hardware.includes('amf' as HardwareAcceleration);
+    const isVideotoolbox = hardware.includes('videotoolbox' as HardwareAcceleration);
+
+    const codec = inputCodec.toLowerCase();
+
+    if (codec === 'h264') {
+      if (isCuda) return { hwaccel: 'cuda', codec: 'h264_cuvid' };
+      if (isQsv) return { hwaccel: 'qsv', codec: 'h264_qsv' };
+    } else if (codec === 'h265' || codec === 'hevc') {
+      if (isCuda) return { hwaccel: 'cuda', codec: 'hevc_cuvid' };
+      if (isQsv) return { hwaccel: 'qsv', codec: 'hevc_qsv' };
+    } else if (codec === 'vp9') {
+      if (isCuda) return { hwaccel: 'cuda', codec: 'vp9_cuvid' };
+      if (isQsv) return { hwaccel: 'qsv', codec: 'vp9_qsv' };
+    } else if (codec === 'av1') {
+      if (isCuda) return { hwaccel: 'cuda', codec: 'av1_cuvid' };
+      if (isQsv) return { hwaccel: 'qsv', codec: 'av1_qsv' };
+    }
+
+    if (hardware.length > 0 && !hardware.includes('software' as HardwareAcceleration)) {
+      return { hwaccel: 'auto' };
+    }
+
+    return {};
+  }
+
   /**
    * Determines the optimal video encoder string for ffmpeg based on the target codec and available hardware.
    */
   public static getOptimalVideoEncoder(targetCodec: CodecSupport | string, hardware: HardwareAcceleration[]): string {
-    const isNvenc = hardware.includes('nvenc');
-    const isQsv = hardware.includes('qsv');
-    const isAmf = hardware.includes('amf');
-    const isVideotoolbox = hardware.includes('videotoolbox');
+    const isNvenc = hardware.includes('nvenc' as HardwareAcceleration);
+    const isQsv = hardware.includes('qsv' as HardwareAcceleration);
+    const isAmf = hardware.includes('amf' as HardwareAcceleration);
+    const isVideotoolbox = hardware.includes('videotoolbox' as HardwareAcceleration);
 
     switch (targetCodec) {
       case 'h264':

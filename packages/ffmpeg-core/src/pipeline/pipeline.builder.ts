@@ -1,4 +1,6 @@
 import ffmpeg, { FfmpegCommand } from 'fluent-ffmpeg';
+import { CodecManager } from '../managers/codec.manager';
+import { HardwareManager } from '../managers/hardware.manager';
 import { FilterGraph } from './filter.graph';
 import {
   TrimOptions,
@@ -25,9 +27,28 @@ export class PipelineBuilder {
 
   /**
    * Adds an input file to the FFmpeg command.
+   * Accepts an optional inputCodec to determine the optimal hardware decoder.
    */
-  public addInput(path: string): this {
+  public addInput(path: string, options?: { inputCodec?: string }): this {
     this.command.input(path);
+
+    if (options?.inputCodec) {
+      const hardware = HardwareManager.detectHardwareAcceleration();
+      const decoder = CodecManager.getOptimalVideoDecoder(options.inputCodec, hardware);
+      
+      const inputOptions: string[] = [];
+      if (decoder.hwaccel) {
+        inputOptions.push(`-hwaccel ${decoder.hwaccel}`);
+      }
+      if (decoder.codec) {
+        inputOptions.push(`-c:v ${decoder.codec}`);
+      }
+      
+      if (inputOptions.length > 0) {
+        this.command.inputOptions(inputOptions);
+      }
+    }
+
     return this;
   }
 

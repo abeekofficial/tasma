@@ -24,3 +24,7 @@ export * from './pipeline/operations/audio.operations';
 export * from './pipeline/operations/audio-filter.operations';
 export * from './pipeline/operations/voice.operations';
 export * from './pipeline/operations/sync.operations';
+export * from './managers/frame-cache.manager';
+export * from './performance/resource.monitor';
+export * from './performance/benchmark.service';
+export * from './performance/performance.engine';

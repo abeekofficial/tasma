@@ -130,3 +130,19 @@ export type FadeOptions = z.infer<typeof FadeOptionsSchema>;
 export type EqualizerOptions = z.infer<typeof EqualizerOptionsSchema>;
 export type CompressorOptions = z.infer<typeof CompressorOptionsSchema>;
 export type NoiseGateOptions = z.infer<typeof NoiseGateOptionsSchema>;
+
+export const SystemResourcesSchema = z.object({
+  cpuUsage: z.number(),
+  memoryFree: z.number(),
+  gpuUsage: z.number().optional(),
+  diskFree: z.number(),
+});
+
+export const BenchmarkResultSchema = z.object({
+  encodeSpeed: z.number(),
+  decodeSpeed: z.number(),
+  score: z.number(),
+});
+
+export type SystemResources = z.infer<typeof SystemResourcesSchema>;
+export type BenchmarkResult = z.infer<typeof BenchmarkResultSchema>;
