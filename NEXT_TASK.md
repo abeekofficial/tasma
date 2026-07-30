@@ -1,12 +1,12 @@
 ## Next Task
 
-**Phase 9.1D — Backend CRUD Modules**
+**Phase 9.1E — Backend CRUD Modules**
 
 ### Resume Point
-Phase 9.1C (Video Processing Engine) is fully complete (7 files added, 238 total).
-The `@tasma/ffmpeg-core` package now features a robust `PipelineBuilder` and `FilterGraph` abstraction for programmatically generating advanced FFmpeg complex filter graphs for operations like overlays, scaling, trimming, and color grading.
+Phase 9.1D (Audio Processing Engine) is fully complete (4 files added, 242 total).
+The `@tasma/ffmpeg-core` package now features advanced audio processing logic, seamlessly extending the Pipeline Builder to support volume adjustments, equalizers, noise gates, voice enhancements, and A/V synchronization mappings.
 
-### Phase 9.1D — Backend CRUD Modules
+### Phase 9.1E — Backend CRUD Modules
 - `apps/api/src/modules/projects/projects.service.ts`
 - `apps/api/src/modules/projects/projects.controller.ts`
 - `apps/api/src/modules/projects/projects.routes.ts`
@@ -26,7 +26,7 @@ The `@tasma/ffmpeg-core` package now features a robust `PipelineBuilder` and `Fi
 - `apps/api/src/modules/timeline/timeline.validators.ts`
 
 ### Last Completed File
-`packages/ffmpeg-core/src/pipeline/operations/video.operations.ts`
+`packages/ffmpeg-core/src/pipeline/operations/voice.operations.ts`
 
 ### Do Not Regenerate
-Everything in phases 1-9.1C (238 files already complete).
+Everything in phases 1-9.1D (242 files already complete).

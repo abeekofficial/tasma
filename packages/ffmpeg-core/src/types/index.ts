@@ -89,3 +89,44 @@ export type ScaleOptions = z.infer<typeof ScaleOptionsSchema>;
 export type OverlayOptions = z.infer<typeof OverlayOptionsSchema>;
 export type ColorCorrectionOptions = z.infer<typeof ColorCorrectionOptionsSchema>;
 export type PipelineJobConfig = z.infer<typeof PipelineJobConfigSchema>;
+
+export const AudioTrimOptionsSchema = z.object({
+  startTime: z.union([z.number(), z.string()]).optional(),
+  endTime: z.union([z.number(), z.string()]).optional(),
+  duration: z.number().optional(),
+});
+
+export const FadeOptionsSchema = z.object({
+  type: z.enum(['in', 'out']),
+  startTime: z.number(),
+  duration: z.number(),
+  curve: z.string().optional(),
+});
+
+export const EqualizerOptionsSchema = z.object({
+  frequency: z.number(),
+  width_type: z.string().optional(),
+  width: z.number().optional(),
+  gain: z.number(),
+});
+
+export const CompressorOptionsSchema = z.object({
+  threshold: z.number(),
+  ratio: z.number(),
+  attack: z.number(),
+  release: z.number(),
+  makeup: z.number().optional(),
+});
+
+export const NoiseGateOptionsSchema = z.object({
+  threshold: z.number(),
+  ratio: z.number().optional(),
+  attack: z.number().optional(),
+  release: z.number().optional(),
+});
+
+export type AudioTrimOptions = z.infer<typeof AudioTrimOptionsSchema>;
+export type FadeOptions = z.infer<typeof FadeOptionsSchema>;
+export type EqualizerOptions = z.infer<typeof EqualizerOptionsSchema>;
+export type CompressorOptions = z.infer<typeof CompressorOptionsSchema>;
+export type NoiseGateOptions = z.infer<typeof NoiseGateOptionsSchema>;

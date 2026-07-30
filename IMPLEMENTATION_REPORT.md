@@ -16,33 +16,35 @@
 | Phase 8C — Worker & AI | ✅ Complete | 17 | BullMQ Worker App, AI Module, Jobs Module |
 | Phase 9.1A — FFmpeg Core | ✅ Complete | 10 | `@tasma/ffmpeg-core` Workspace Library |
 | Phase 9.1B — Media Analysis | ✅ Complete | 8 | Video/Audio/Image/Quality Analyzers & Generators |
-| **Phase 9.1C — Video Processing** | **✅ Complete** | **7** | **Pipeline Builder, Complex Filter Graphs, Operations** |
-| Phase 9.1D — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
+| Phase 9.1C — Video Processing | ✅ Complete | 7 | Pipeline Builder, Complex Filter Graphs, Operations |
+| **Phase 9.1D — Audio Processing** | **✅ Complete** | **4** | **EQ, Comp, Voice Enhancements, A/V Sync** |
+| Phase 9.1E — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 238 files
+## Current File Count: 242 files
 
-## Phase 9.1C Deliverables (Video Processing Engine)
+## Phase 9.1D Deliverables (Audio Processing Engine)
 
-### Pipeline Architecture
+### Core Audio Adjustments
 | File | Purpose |
 |------|---------|
-| `pipeline.builder.ts` | Fluent interface (`.trim()`, `.crop()`, `.overlay()`) for chaining complex operations into a single execute command. |
-| `filter.graph.ts` | Manages complex graph topology, assigning unique stream identifiers (`[v1]`, `[v2]`) to track inputs across sequential transformations. |
+| `audio.operations.ts` | Base operations: trimming (`atrim`), playback speed mapping (`atempo`), exact MS delay (`adelay`), volume, multi-track crossfades (`acrossfade`), and strict EBU R128 Loudness Normalization. |
 
-### Video Operations
+### Audio Effects & Filtering
 | File | Purpose |
 |------|---------|
-| `video.operations.ts` | Core FFmpeg commands for trimming, splitting, concatenation, cropping, speed interpolation, and looping. |
-| `transform.operations.ts` | Geometry manipulations leveraging filters like `scale` (with preservation bounds), `affine` translation, and rotation. |
-| `frame.operations.ts` | Frame-accurate extraction logic utilizing exact timecodes and `-vframes` syntax for preview fetching. |
+| `audio-filter.operations.ts` | Specialized studio tools outputting FFmpeg commands for Equalization (`anequalizer`), Compression, limiters, noise gates, and High/Low pass filtering targeting exact frequencies. |
 
-### Effects & Compositing
+### Voice Enhancements
 | File | Purpose |
 |------|---------|
-| `overlay.operations.ts` | Multi-track compositing (`overlay` filter) with opacity manipulation and coordinate-based positioning for watermarks and PiP. |
-| `color.operations.ts` | Advanced grading tools invoking filters like `eq` (brightness, contrast, saturation) and `boxblur` for post-processing effects. |
+| `voice.operations.ts` | Logic mapped for background noise reduction (`afftdn`), automatic silent segment detection & removal (`silenceremove`), and vocal bandpass enhancements. |
+
+### Synchronization
+| File | Purpose |
+|------|---------|
+| `sync.operations.ts` | Resolves A/V drift when combining multiple disparate clips by providing `aresample=async=1` options and negative offset mappings via `-itsoffset`. |
 
 ### Architecture Highlights
-- **Declarative Processing:** The `PipelineBuilder` abstracts the notoriously difficult syntax of FFmpeg's `-filter_complex`. The worker queue can simply issue declarative Javascript commands (e.g. `builder.trim({start: 0, end: 5}).overlay({x: 10, y: 10})`) and the builder automatically constructs the appropriate stream mappings.
-- **Dependency Injection:** The builder takes the existing `FFmpegService` as a dependency, meaning the same process wrapper (with error handling and progress events) designed in Phase 9.1A is uniformly utilized during rendering.
+- **Unified Pipeline Extension:** Rather than creating a separate audio pipeline, we seamlessly extended the existing fluent `PipelineBuilder`. Audio commands (like `.equalize()` or `.adjustVolume()`) simply route dynamically to the `[0:a]` internal tracking graph, meaning developers can construct an entire A/V render in a single chained call.
+- **Strict Parameter Safety:** The `Zod` typings defined in Phase 9.1C were rigorously extended in Phase 9.1D. Now, sending an impossible compression ratio or illegal equalization frequency to the builder will fail instantly with a structured Type error, long before FFmpeg is executed.

@@ -20,3 +20,7 @@ export * from './pipeline/operations/transform.operations';
 export * from './pipeline/operations/frame.operations';
 export * from './pipeline/operations/overlay.operations';
 export * from './pipeline/operations/color.operations';
+export * from './pipeline/operations/audio.operations';
+export * from './pipeline/operations/audio-filter.operations';
+export * from './pipeline/operations/voice.operations';
+export * from './pipeline/operations/sync.operations';

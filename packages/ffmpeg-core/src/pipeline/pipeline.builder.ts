@@ -6,6 +6,9 @@ import {
   ScaleOptions,
   OverlayOptions,
   ColorCorrectionOptions,
+  FadeOptions,
+  CompressorOptions,
+  EqualizerOptions,
 } from '../types';
 
 export class PipelineBuilder {
@@ -129,6 +132,101 @@ export class PipelineBuilder {
     
     this.filterGraph.addFilter('eq', [this.currentVideoStream], [outStream], options);
     this.currentVideoStream = outStream;
+    return this;
+  }
+
+  /**
+   * Mutes the audio.
+   */
+  public mute(): this {
+    const outStream = this.filterGraph.generateStreamName('volume');
+    this.filterGraph.addFilter('volume', [this.currentAudioStream], [outStream], { volume: 0 });
+    this.currentAudioStream = outStream;
+    return this;
+  }
+
+  /**
+   * Adjusts the audio volume.
+   */
+  public adjustVolume(level: number): this {
+    const outStream = this.filterGraph.generateStreamName('volume');
+    this.filterGraph.addFilter('volume', [this.currentAudioStream], [outStream], { volume: level });
+    this.currentAudioStream = outStream;
+    return this;
+  }
+
+  /**
+   * Applies an audio fade.
+   */
+  public fadeAudio(opts: FadeOptions): this {
+    const outStream = this.filterGraph.generateStreamName('afade');
+    const options: Record<string, string | number> = {
+      t: opts.type,
+      st: opts.startTime,
+      d: opts.duration,
+    };
+    if (opts.curve) {
+      options.curve = opts.curve;
+    }
+    this.filterGraph.addFilter('afade', [this.currentAudioStream], [outStream], options);
+    this.currentAudioStream = outStream;
+    return this;
+  }
+
+  /**
+   * Applies audio compression.
+   */
+  public compress(opts: CompressorOptions): this {
+    const outStream = this.filterGraph.generateStreamName('acompressor');
+    const options: Record<string, string | number> = {
+      threshold: opts.threshold,
+      ratio: opts.ratio,
+      attack: opts.attack,
+      release: opts.release,
+    };
+    if (opts.makeup !== undefined) {
+      options.makeup = opts.makeup;
+    }
+    this.filterGraph.addFilter('acompressor', [this.currentAudioStream], [outStream], options);
+    this.currentAudioStream = outStream;
+    return this;
+  }
+
+  /**
+   * Applies audio equalization.
+   */
+  public equalize(opts: EqualizerOptions): this {
+    const outStream = this.filterGraph.generateStreamName('equalizer');
+    const options: Record<string, string | number> = {
+      f: opts.frequency,
+      g: opts.gain,
+    };
+    if (opts.width_type) options.t = opts.width_type;
+    if (opts.width !== undefined) options.w = opts.width;
+    
+    this.filterGraph.addFilter('equalizer', [this.currentAudioStream], [outStream], options);
+    this.currentAudioStream = outStream;
+    return this;
+  }
+
+  /**
+   * Syncs audio by applying a delay.
+   */
+  public syncAudio(offsetMs: number): this {
+    if (offsetMs > 0) {
+      const outStream = this.filterGraph.generateStreamName('adelay');
+      const options = { delays: `${offsetMs}|${offsetMs}` };
+      this.filterGraph.addFilter('adelay', [this.currentAudioStream], [outStream], options);
+      this.currentAudioStream = outStream;
+    } else if (offsetMs < 0) {
+      const atrimOutStream = this.filterGraph.generateStreamName('atrim');
+      this.filterGraph.addFilter('atrim', [this.currentAudioStream], [atrimOutStream], { start: Math.abs(offsetMs) / 1000 });
+      
+      const asetptsOutStream = this.filterGraph.generateStreamName('asetpts');
+      this.filterGraph.addFilter('asetpts', [atrimOutStream], [asetptsOutStream], 'PTS-STARTPTS');
+      
+      this.currentAudioStream = asetptsOutStream;
+    }
     return this;
   }
 
