@@ -1,0 +1,2295 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgcrypto, uuid_ossp]
+}
+
+// ===== ENUMS =====
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  SUPPORT
+  MODERATOR
+  CREATOR
+  PREMIUM
+  USER
+  GUEST
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+  DELETED
+}
+
+enum OrganizationPlan {
+  FREE
+  STARTER
+  PRO
+  TEAM
+  ENTERPRISE
+}
+
+enum OrganizationMemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+  BILLING
+}
+
+enum OrganizationInviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum TeamMemberRole {
+  LEAD
+  MEMBER
+}
+
+enum ProjectStatus {
+  DRAFT
+  IN_PROGRESS
+  IN_REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ProjectVisibility {
+  PRIVATE
+  TEAM
+  ORGANIZATION
+  PUBLIC
+}
+
+enum Platform {
+  YOUTUBE_SHORTS
+  TIKTOK
+  INSTAGRAM_REELS
+  FACEBOOK_REELS
+  CUSTOM
+}
+
+enum AspectRatio {
+  PORTRAIT_9_16
+  LANDSCAPE_16_9
+  SQUARE_1_1
+}
+
+enum Resolution {
+  HD_720
+  FHD_1080
+  QHD_1440
+  UHD_4K
+}
+
+enum ProjectCollaboratorPermission {
+  OWNER
+  EDITOR
+  COMMENTER
+  VIEWER
+}
+
+enum MediaAssetType {
+  IMAGE
+  VIDEO
+  AUDIO
+  FONT
+  DOCUMENT
+  OTHER
+}
+
+enum StorageProvider {
+  CLOUDFLARE_R2
+  S3
+  LOCAL
+}
+
+enum MediaStatus {
+  UPLOADING
+  PROCESSING
+  READY
+  FAILED
+  QUARANTINED
+}
+
+enum VirusScanStatus {
+  PENDING
+  CLEAN
+  INFECTED
+  SKIPPED
+}
+
+enum UploadSessionStatus {
+  INITIATED
+  IN_PROGRESS
+  COMPLETING
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+enum UploadChunkStatus {
+  PENDING
+  UPLOADED
+  VERIFIED
+  FAILED
+}
+
+enum ThumbnailType {
+  SMALL
+  MEDIUM
+  LARGE
+  POSTER
+  SPRITE
+}
+
+enum TemplateCategory {
+  REDDIT_STORY
+  TOP_LIST
+  PODCAST_CLIP
+  PRODUCT_SHOWCASE
+  TUTORIAL
+  NEWS
+  CUSTOM
+}
+
+enum TemplateVariableType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  COLOR
+  NUMBER
+}
+
+enum TrackType {
+  VIDEO
+  AUDIO
+  TEXT
+  IMAGE
+  EFFECT
+  SUBTITLE
+}
+
+enum ClipType {
+  VIDEO
+  AUDIO
+  IMAGE
+  TEXT
+  SHAPE
+  AI_VOICE
+  AI_IMAGE
+  AI_VIDEO
+  SUBTITLE
+}
+
+enum EffectType {
+  FADE_IN
+  FADE_OUT
+  BLUR
+  BRIGHTNESS
+  CONTRAST
+  SATURATION
+  HUE
+  GRAYSCALE
+  SEPIA
+  INVERT
+  CHROMAKEY
+  ZOOM
+  PAN
+  KEN_BURNS
+  CUSTOM
+}
+
+enum TransitionType {
+  CUT
+  CROSSFADE
+  DISSOLVE
+  WIPE_LEFT
+  WIPE_RIGHT
+  SLIDE_LEFT
+  SLIDE_RIGHT
+  ZOOM_IN
+  ZOOM_OUT
+  CUSTOM
+}
+
+enum Easing {
+  LINEAR
+  EASE_IN
+  EASE_OUT
+  EASE_IN_OUT
+  CUBIC_BEZIER
+}
+
+enum SubtitleSource {
+  MANUAL
+  AI_GENERATED
+  IMPORTED
+}
+
+enum SubtitleStatus {
+  DRAFT
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum AiProviderType {
+  LLM
+  TTS
+  STT
+  IMAGE_GEN
+  VIDEO_GEN
+}
+
+enum AiProviderStatus {
+  ACTIVE
+  DEGRADED
+  DISABLED
+  MAINTENANCE
+}
+
+enum AiPromptCategory {
+  SCRIPT
+  HOOK
+  CAPTION
+  DESCRIPTION
+  HASHTAG
+  TRANSLATION
+  CUSTOM
+}
+
+enum AiGenerationType {
+  SCRIPT
+  VOICE
+  IMAGE
+  VIDEO
+  SUBTITLE
+  TRANSLATION
+  HOOK
+  DESCRIPTION
+}
+
+enum AiGenerationStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum AiVoiceGender {
+  MALE
+  FEMALE
+  NEUTRAL
+}
+
+enum AiVoiceStyle {
+  CONVERSATIONAL
+  NARRATION
+  NEWS
+  ENERGETIC
+  CALM
+  PROFESSIONAL
+}
+
+enum AiVoiceCloneStatus {
+  PENDING
+  TRAINING
+  READY
+  FAILED
+  REVOKED
+}
+
+enum AiUsageType {
+  SCRIPT
+  VOICE
+  IMAGE
+  VIDEO
+  SUBTITLE
+}
+
+enum RenderJobType {
+  PREVIEW
+  EXPORT
+  THUMBNAIL
+  SOCIAL_PUBLISH
+}
+
+enum RenderJobStatus {
+  QUEUED
+  ASSIGNED
+  PROCESSING
+  ENCODING
+  UPLOADING
+  COMPLETED
+  FAILED
+  CANCELLED
+  TIMED_OUT
+}
+
+enum RenderJobPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum RenderFormat {
+  MP4
+  WEBM
+  MOV
+  GIF
+}
+
+enum RenderQuality {
+  DRAFT
+  STANDARD
+  HIGH
+  ULTRA
+}
+
+enum Codec {
+  H264
+  H265
+  VP9
+  AV1
+}
+
+enum LogLevel {
+  INFO
+  WARN
+  ERROR
+  DEBUG
+}
+
+enum SocialPlatform {
+  YOUTUBE
+  TIKTOK
+  INSTAGRAM
+  FACEBOOK
+  TWITTER
+}
+
+enum SocialAccountStatus {
+  CONNECTED
+  EXPIRED
+  REVOKED
+  ERROR
+}
+
+enum SocialVisibility {
+  PUBLIC
+  UNLISTED
+  PRIVATE
+  DRAFT
+}
+
+enum SocialPublishStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHING
+  PUBLISHED
+  FAILED
+  REMOVED
+}
+
+enum PlanTier {
+  FREE
+  STARTER
+  PRO
+  TEAM
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+  TRIALING
+  PAUSED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  VOID
+  UNCOLLECTIBLE
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentMethod {
+  CARD
+  BANK_TRANSFER
+  PAYPAL
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum ReferralStatus {
+  SIGNED_UP
+  ACTIVATED
+  CONVERTED
+  EXPIRED
+}
+
+enum CommentStatus {
+  ACTIVE
+  RESOLVED
+  DELETED
+}
+
+enum SharePermission {
+  VIEW
+  COMMENT
+  EDIT
+}
+
+enum NotificationType {
+  RENDER_COMPLETE
+  RENDER_FAILED
+  COMMENT_ADDED
+  COMMENT_MENTION
+  COMMENT_RESOLVED
+  TEAM_INVITE
+  PROJECT_SHARED
+  EXPORT_READY
+  AI_COMPLETE
+  AI_FAILED
+  SUBSCRIPTION_EXPIRING
+  PAYMENT_FAILED
+  SYSTEM_ANNOUNCEMENT
+}
+
+enum NotificationDigestFrequency {
+  REALTIME
+  HOURLY
+  DAILY
+  WEEKLY
+  NEVER
+}
+
+enum ActivityAction {
+  LOGIN
+  LOGOUT
+  PROJECT_CREATED
+  PROJECT_UPDATED
+  PROJECT_DELETED
+  PROJECT_PUBLISHED
+  RENDER_STARTED
+  RENDER_COMPLETED
+  EXPORT_DOWNLOADED
+  AI_GENERATION
+  MEMBER_INVITED
+  MEMBER_REMOVED
+  SETTINGS_UPDATED
+  ASSET_UPLOADED
+  ASSET_DELETED
+  COMMENT_ADDED
+  SHARE_CREATED
+}
+
+enum WebhookStatus {
+  ACTIVE
+  DISABLED
+  FAILING
+}
+
+enum ErrorLevel {
+  ERROR
+  FATAL
+  WARNING
+}
+
+enum ErrorSource {
+  API
+  WORKER
+  AI
+  RENDERING
+  BILLING
+  AUTH
+}
+
+enum SystemSettingCategory {
+  GENERAL
+  AI
+  RENDERING
+  BILLING
+  STORAGE
+  NOTIFICATION
+  SECURITY
+}
+
+enum RateLimitScope {
+  GLOBAL
+  PER_USER
+  PER_ORGANIZATION
+  PER_IP
+  PER_API_KEY
+}
+
+enum AnalyticsSource {
+  WEB
+  API
+  WORKER
+}
+
+enum FavoriteResourceType {
+  PROJECT
+  TEMPLATE
+  ASSET
+  VOICE
+}
+
+enum CollectionResourceType {
+  PROJECT
+  TEMPLATE
+  ASSET
+}
+
+// ===== AUTHENTICATION & USERS =====
+
+model User {
+  id                 String     @id @default(uuid())
+  email              String     @unique
+  emailVerified      Boolean    @default(false)
+  name               String?
+  avatarUrl          String?
+  role               Role       @default(USER)
+  status             UserStatus @default(ACTIVE)
+  lastLoginAt        DateTime?
+  lastLoginIp        String?
+  twoFactorEnabled   Boolean    @default(false)
+  onboardingCompleted Boolean   @default(false)
+  timezone           String?
+  locale             String?    @default("en-US")
+  username           String?    @unique
+  coverImageUrl      String?
+  country            String?
+  language           String?    @default("en")
+  theme              String?    @default("system")
+  provider           String?    @default("credentials")
+  failedLoginAttempts Int       @default(0)
+  lockedUntil        DateTime?
+  lastPasswordChangedAt DateTime?
+  suspiciousLoginDetected Boolean @default(false)
+  deletedAt          DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  accounts                Account[]
+  sessions                Session[]
+  profile                 UserProfile?
+  apiKeys                 ApiKey[]
+  organizationMembers     OrganizationMember[]
+  teamMembers             TeamMembers[]
+  projects                Project[]
+  projectCollaborators    ProjectCollaborator[]
+  mediaAssets             MediaAsset[]
+  mediaUploadSessions     MediaUploadSession[]
+  templates               Template[]
+  aiGenerations           AiGeneration[]
+  aiVoiceClones           AiVoiceClone[]
+  aiUsageQuotas           AiUsageQuota[]
+  renderJobs              RenderJob[]
+  exportHistories         ExportHistory[]
+  socialAccounts          SocialAccount[]
+  socialPublishes         SocialPublish[]
+  subscriptions           Subscription[]
+  invoices                Invoice[]
+  payments                Payment[]
+  couponRedemptions       CouponRedemption[]
+  referralCode            ReferralCode?
+  referrals               Referral[]           @relation("ReferredUser")
+  comments                Comment[]            @relation("CommentAuthor")
+  resolvedComments        Comment[]            @relation("CommentResolver")
+  commentReactions        CommentReaction[]
+  commentMentions         CommentMention[]
+  shareLinks              ShareLink[]
+  shareLinkAccesses       ShareLinkAccess[]
+  notifications           Notification[]
+  notificationPreference  NotificationPreference?
+  favorites               Favorite[]
+  collections             Collection[]
+  recentItems             RecentlyOpened[]
+  storageUsage            StorageUsage?
+
+  @@index([email])
+  @@index([username])
+  @@index([status])
+  @@map("users")
+}
+
+model Account {
+  id                String   @id @default(uuid())
+  userId            String
+  providerId        String
+  providerAccountId String
+  accessToken       String?
+  refreshToken      String?
+  expiresAt         DateTime?
+  scope             String?
+  idToken           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+model Verification {
+  id         String   @id @default(uuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verifications")
+}
+
+model UserProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  bio         String?
+  website     String?
+  socialLinks Json?
+  phone       String?
+  company     String?
+  jobTitle    String?
+  location    String?
+  interests   String[]
+  coverImageUrl  String?
+  country        String?
+  language       String?  @default("en")
+  theme          String?  @default("system")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model ApiKey {
+  id             String    @id @default(uuid())
+  userId         String
+  organizationId String?
+  name           String
+  key            String    @unique
+  prefix         String
+  permissions    String[]
+  lastUsedAt     DateTime?
+  expiresAt      DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@map("api_keys")
+}
+
+// ===== ORGANIZATIONS & TEAMS =====
+
+model Organization {
+  id           String           @id @default(uuid())
+  name         String
+  slug         String           @unique
+  logoUrl      String?
+  domain       String?
+  billingEmail String?
+  plan         OrganizationPlan @default(FREE)
+  maxMembers   Int              @default(5)
+  maxStorage   BigInt           @default(5368709120) // 5GB default
+  storageUsed  BigInt           @default(0)
+  status       UserStatus       @default(ACTIVE)
+  metadata     Json?
+  deletedAt    DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  members          OrganizationMember[]
+  invites          OrganizationInvite[]
+  teams            Team[]
+  workspaces       Workspace[]
+  apiKeys          ApiKey[]
+  templates        Template[]
+  aiGenerations    AiGeneration[]
+  aiUsageQuotas    AiUsageQuota[]
+  renderJobs       RenderJob[]
+  socialAccounts   SocialAccount[]
+  subscription     Subscription?
+  invoices         Invoice[]
+  payments         Payment[]
+  webhookEndpoints WebhookEndpoint[]
+  storageUsage     StorageUsage?
+
+  @@index([slug])
+  @@index([status])
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String                 @id @default(uuid())
+  organizationId String
+  userId         String
+  role           OrganizationMemberRole @default(MEMBER)
+  invitedBy      String?
+  joinedAt       DateTime               @default(now())
+  deletedAt      DateTime?
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
+  @@map("organization_members")
+}
+
+model OrganizationInvite {
+  id             String                   @id @default(uuid())
+  organizationId String
+  email          String
+  role           OrganizationMemberRole   @default(MEMBER)
+  token          String                   @unique
+  invitedById    String
+  status         OrganizationInviteStatus @default(PENDING)
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([email])
+  @@index([token])
+  @@map("organization_invites")
+}
+
+model Team {
+  id             String    @id @default(uuid())
+  organizationId String
+  name           String
+  slug           String
+  description    String?
+  avatarUrl      String?
+  deletedAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members      TeamMembers[]
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@map("teams")
+}
+
+model TeamMembers {
+  id        String         @id @default(uuid())
+  teamId    String
+  userId    String
+  role      TeamMemberRole @default(MEMBER)
+  joinedAt  DateTime       @default(now())
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([teamId])
+  @@index([userId])
+  @@map("team_members")
+}
+
+// ===== WORKSPACE & PROJECTS =====
+
+model Workspace {
+  id             String    @id @default(uuid())
+  organizationId String
+  name           String
+  slug           String
+  description    String?
+  settings       Json?
+  deletedAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  projects     Project[]
+  folders      Folder[]
+  mediaAssets  MediaAsset[]
+  collections  Collection[]
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@map("workspaces")
+}
+
+model Project {
+  id           String            @id @default(uuid())
+  workspaceId  String
+  createdById  String
+  name         String
+  slug         String
+  description  String?
+  thumbnailUrl String?
+  status       ProjectStatus     @default(DRAFT)
+  visibility   ProjectVisibility @default(PRIVATE)
+  platform     Platform          @default(CUSTOM)
+  aspectRatio  AspectRatio       @default(LANDSCAPE_16_9)
+  resolution   Resolution        @default(FHD_1080)
+  fps          Int               @default(30)
+  duration     Float?
+  settings     Json?
+  tags         String[]
+  version      Int               @default(1)
+  publishedAt  DateTime?
+  deletedAt    DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  workspace       Workspace             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator         User                  @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  collaborators   ProjectCollaborator[]
+  projectFolders  ProjectFolder[]
+  timeline        Timeline?
+  subtitleTracks  SubtitleTrack[]
+  aiGenerations   AiGeneration[]
+  renderJobs      RenderJob[]
+  exportHistories ExportHistory[]
+  socialPublishes SocialPublish[]
+  comments        Comment[]
+  shareLinks      ShareLink[]
+  versionHistories VersionHistory[]
+
+  @@index([workspaceId])
+  @@index([createdById])
+  @@index([status])
+  @@index([slug])
+  @@map("projects")
+}
+
+model ProjectCollaborator {
+  id         String                        @id @default(uuid())
+  projectId  String
+  userId     String
+  permission ProjectCollaboratorPermission @default(VIEWER)
+  addedById  String
+  createdAt  DateTime                      @default(now())
+  updatedAt  DateTime                      @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+  @@map("project_collaborators")
+}
+
+model Folder {
+  id          String    @id @default(uuid())
+  workspaceId String
+  parentId    String?
+  name        String
+  slug        String
+  color       String?
+  sortOrder   Int       @default(0)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  parent         Folder?         @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: SetNull)
+  children       Folder[]        @relation("FolderToFolder")
+  projectFolders ProjectFolder[]
+
+  @@index([workspaceId])
+  @@index([parentId])
+  @@map("folders")
+}
+
+model ProjectFolder {
+  id        String   @id @default(uuid())
+  projectId String
+  folderId  String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  folder  Folder  @relation(fields: [folderId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, folderId])
+  @@index([projectId])
+  @@index([folderId])
+  @@map("project_folders")
+}
+
+// ===== MEDIA ASSETS =====
+
+model MediaAsset {
+  id              String          @id @default(uuid())
+  workspaceId     String
+  uploadedById    String
+  type            MediaAssetType
+  name            String
+  originalFilename String
+  mimeType        String
+  size            BigInt
+  storageKey      String
+  storageProvider StorageProvider @default(S3)
+  cdnUrl          String?
+  thumbnailUrl    String?
+  status          MediaStatus     @default(UPLOADING)
+  virusScanStatus VirusScanStatus @default(PENDING)
+  width           Int?
+  height          Int?
+  duration        Float?
+  bitrate         Int?
+  codec           String?
+  colorSpace      String?
+  metadata        Json?
+  hash            String?
+  tags            String[]
+  isPublic        Boolean         @default(false)
+  deletedAt       DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  workspace       Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  uploader        User                 @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+  uploadSessions  MediaUploadSession[]
+  thumbnails      MediaThumbnail[]
+  timelineClips   TimelineClip[]
+  voiceClones     AiVoiceClone[]
+
+  @@index([workspaceId])
+  @@index([uploadedById])
+  @@index([type])
+  @@index([hash])
+  @@map("media_assets")
+}
+
+model MediaUploadSession {
+  id            String              @id @default(uuid())
+  mediaAssetId  String?
+  userId        String
+  filename      String
+  mimeType      String
+  totalSize     BigInt
+  uploadedSize  BigInt              @default(0)
+  totalChunks   Int
+  uploadedChunks Int                @default(0)
+  status        UploadSessionStatus @default(INITIATED)
+  storageKey    String
+  expiresAt     DateTime
+  completedAt   DateTime?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  mediaAsset MediaAsset?        @relation(fields: [mediaAssetId], references: [id], onDelete: Cascade)
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chunks     MediaUploadChunk[]
+
+  @@index([mediaAssetId])
+  @@index([userId])
+  @@index([status])
+  @@map("media_upload_sessions")
+}
+
+model MediaUploadChunk {
+  id              String            @id @default(uuid())
+  uploadSessionId String
+  chunkIndex      Int
+  size            BigInt
+  etag            String?
+  status          UploadChunkStatus @default(PENDING)
+  createdAt       DateTime          @default(now())
+
+  uploadSession MediaUploadSession @relation(fields: [uploadSessionId], references: [id], onDelete: Cascade)
+
+  @@unique([uploadSessionId, chunkIndex])
+  @@index([uploadSessionId])
+  @@map("media_upload_chunks")
+}
+
+model MediaThumbnail {
+  id           String        @id @default(uuid())
+  mediaAssetId String
+  type         ThumbnailType
+  width        Int
+  height       Int
+  storageKey   String
+  cdnUrl       String
+  size         BigInt
+  createdAt    DateTime      @default(now())
+
+  mediaAsset MediaAsset @relation(fields: [mediaAssetId], references: [id], onDelete: Cascade)
+
+  @@index([mediaAssetId])
+  @@map("media_thumbnails")
+}
+
+// ===== TEMPLATES =====
+
+model Template {
+  id             String           @id @default(uuid())
+  createdById    String
+  organizationId String?
+  name           String
+  slug           String
+  description    String?
+  thumbnailUrl   String?
+  category       TemplateCategory @default(CUSTOM)
+  platform       Platform?
+  aspectRatio    AspectRatio?
+  resolution     Resolution?
+  tags           String[]
+  timelineData   Json
+  variables      Json
+  isPublic       Boolean          @default(false)
+  isFeatured     Boolean          @default(false)
+  usageCount     Int              @default(0)
+  rating         Float?
+  deletedAt      DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  creator      User               @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  organization Organization?      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  templateVars TemplateVariable[]
+
+  @@index([createdById])
+  @@index([organizationId])
+  @@index([category])
+  @@index([slug])
+  @@map("templates")
+}
+
+model TemplateVariable {
+  id              String               @id @default(uuid())
+  templateId      String
+  name            String
+  label           String
+  type            TemplateVariableType
+  defaultValue    String?
+  required        Boolean              @default(true)
+  validationRules Json?
+  sortOrder       Int
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  template Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@index([templateId])
+  @@map("template_variables")
+}
+
+// ===== TIMELINE & EDITOR =====
+
+model Timeline {
+  id              String   @id @default(uuid())
+  projectId       String   @unique
+  duration        Float    @default(0)
+  fps             Int      @default(30)
+  width           Int
+  height          Int
+  backgroundColor String?
+  settings        Json?
+  version         Int      @default(1)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  project     Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tracks      TimelineTrack[]
+  transitions TimelineTransition[]
+
+  @@map("timelines")
+}
+
+model TimelineTrack {
+  id         String    @id @default(uuid())
+  timelineId String
+  type       TrackType
+  name       String
+  sortOrder  Int
+  isLocked   Boolean   @default(false)
+  isVisible  Boolean   @default(true)
+  isMuted    Boolean   @default(false)
+  volume     Float     @default(1.0)
+  opacity    Float     @default(1.0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  timeline Timeline       @relation(fields: [timelineId], references: [id], onDelete: Cascade)
+  clips    TimelineClip[]
+
+  @@index([timelineId])
+  @@map("timeline_tracks")
+}
+
+model TimelineClip {
+  id              String   @id @default(uuid())
+  trackId         String
+  mediaAssetId    String?
+  type            ClipType
+  name            String
+  startTime       Float
+  endTime         Float
+  duration        Float
+  sourceStartTime Float    @default(0)
+  sourceEndTime   Float?
+  positionX       Float    @default(0)
+  positionY       Float    @default(0)
+  width           Float?
+  height          Float?
+  rotation        Float    @default(0)
+  scaleX          Float    @default(1)
+  scaleY          Float    @default(1)
+  opacity         Float    @default(1)
+  volume          Float    @default(1)
+  speed           Float    @default(1)
+  flipHorizontal  Boolean  @default(false)
+  flipVertical    Boolean  @default(false)
+  borderRadius    Float    @default(0)
+  zIndex          Int      @default(0)
+  locked          Boolean  @default(false)
+  properties      Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  track               TimelineTrack        @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  mediaAsset          MediaAsset?          @relation(fields: [mediaAssetId], references: [id], onDelete: SetNull)
+  effects             TimelineEffect[]
+  keyframes           TimelineKeyframe[]
+  transitionsFrom     TimelineTransition[] @relation("TransitionFromClip")
+  transitionsTo       TimelineTransition[] @relation("TransitionToClip")
+
+  @@index([trackId])
+  @@index([mediaAssetId])
+  @@map("timeline_clips")
+}
+
+model TimelineEffect {
+  id         String     @id @default(uuid())
+  clipId     String
+  type       EffectType
+  parameters Json?
+  startTime  Float
+  duration   Float
+  sortOrder  Int
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  clip TimelineClip @relation(fields: [clipId], references: [id], onDelete: Cascade)
+
+  @@index([clipId])
+  @@map("timeline_effects")
+}
+
+model TimelineTransition {
+  id         String         @id @default(uuid())
+  timelineId String
+  fromClipId String
+  toClipId   String
+  type       TransitionType
+  duration   Float          @default(0.5)
+  parameters Json?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  timeline Timeline     @relation(fields: [timelineId], references: [id], onDelete: Cascade)
+  fromClip TimelineClip @relation("TransitionFromClip", fields: [fromClipId], references: [id], onDelete: Cascade)
+  toClip   TimelineClip @relation("TransitionToClip", fields: [toClipId], references: [id], onDelete: Cascade)
+
+  @@index([timelineId])
+  @@index([fromClipId])
+  @@index([toClipId])
+  @@map("timeline_transitions")
+}
+
+model TimelineKeyframe {
+  id            String   @id @default(uuid())
+  clipId        String
+  property      String
+  time          Float
+  value         Float
+  easing        Easing   @default(LINEAR)
+  controlPoints Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  clip TimelineClip @relation(fields: [clipId], references: [id], onDelete: Cascade)
+
+  @@index([clipId])
+  @@map("timeline_keyframes")
+}
+
+// ===== CAPTIONS & SUBTITLES =====
+
+model SubtitleTrack {
+  id        String         @id @default(uuid())
+  projectId String
+  language  String
+  label     String
+  isDefault Boolean        @default(false)
+  style     Json?
+  source    SubtitleSource @default(MANUAL)
+  status    SubtitleStatus @default(DRAFT)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  project  Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  segments SubtitleSegment[]
+
+  @@index([projectId])
+  @@map("subtitle_tracks")
+}
+
+model SubtitleSegment {
+  id              String   @id @default(uuid())
+  subtitleTrackId String
+  startTime       Float
+  endTime         Float
+  text            String
+  words           Json?
+  speaker         String?
+  confidence      Float?
+  sortOrder       Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  track SubtitleTrack @relation(fields: [subtitleTrackId], references: [id], onDelete: Cascade)
+
+  @@index([subtitleTrackId])
+  @@map("subtitle_segments")
+}
+
+// ===== AI SYSTEM =====
+
+model AiProvider {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  displayName String
+  type        AiProviderType
+  baseUrl     String?
+  status      AiProviderStatus @default(ACTIVE)
+  config      Json?
+  priority    Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  models AiModel[]
+  voices AiVoice[]
+
+  @@index([status])
+  @@map("ai_providers")
+}
+
+model AiModel {
+  id                 String         @id @default(uuid())
+  providerId         String
+  name               String
+  displayName        String
+  type               AiProviderType
+  version            String?
+  inputCostPer1k     Float          @default(0)
+  outputCostPer1k    Float          @default(0)
+  maxTokens          Int?
+  maxDuration        Float?
+  supportedLanguages String[]
+  status             AiProviderStatus @default(ACTIVE)
+  config             Json?
+  isDefault          Boolean        @default(false)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  provider      AiProvider     @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  aiGenerations AiGeneration[]
+
+  @@index([providerId])
+  @@map("ai_models")
+}
+
+model AiPromptTemplate {
+  id                 String           @id @default(uuid())
+  createdById        String
+  name               String
+  slug               String           @unique
+  description        String?
+  category           AiPromptCategory
+  systemPrompt       String?
+  userPromptTemplate String
+  variables          Json?
+  modelId            String?
+  temperature        Float            @default(0.7)
+  maxTokens          Int?
+  version            Int              @default(1)
+  isPublic           Boolean          @default(false)
+  usageCount         Int              @default(0)
+  deletedAt          DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  aiGenerations AiGeneration[]
+
+  @@index([createdById])
+  @@index([category])
+  @@index([slug])
+  @@map("ai_prompt_templates")
+}
+
+model AiGeneration {
+  id                 String             @id @default(uuid())
+  userId             String
+  projectId          String?
+  organizationId     String?
+  modelId            String
+  promptTemplateId   String?
+  type               AiGenerationType
+  status             AiGenerationStatus @default(PENDING)
+  input              Json
+  output             Json?
+  inputTokens        Int?
+  outputTokens       Int?
+  cost               Float?
+  duration           Float?
+  errorMessage       String?
+  errorCode          String?
+  retryCount         Int                @default(0)
+  parentGenerationId String?
+  metadata           Json?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project        Project?          @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  organization   Organization?     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  model          AiModel           @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  promptTemplate AiPromptTemplate? @relation(fields: [promptTemplateId], references: [id], onDelete: SetNull)
+  parent         AiGeneration?     @relation("GenerationChain", fields: [parentGenerationId], references: [id], onDelete: SetNull)
+  children       AiGeneration[]    @relation("GenerationChain")
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([organizationId])
+  @@index([status])
+  @@map("ai_generations")
+}
+
+model AiVoice {
+  id             String           @id @default(uuid())
+  providerId     String
+  name           String
+  displayName    String
+  language       String
+  gender         AiVoiceGender
+  style          AiVoiceStyle
+  previewUrl     String?
+  isCloned       Boolean          @default(false)
+  clonedByUserId String?
+  sampleUrl      String?
+  status         AiProviderStatus @default(ACTIVE)
+  config         Json?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  provider AiProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([providerId])
+  @@map("ai_voices")
+}
+
+model AiVoiceClone {
+  id                String             @id @default(uuid())
+  userId            String
+  voiceId           String?
+  name              String
+  sampleAssetId     String
+  status            AiVoiceCloneStatus @default(PENDING)
+  consentRecordedAt DateTime
+  consentIpAddress  String
+  trainingDuration  Float?
+  expiresAt         DateTime?
+  revokedAt         DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sampleAsset MediaAsset @relation(fields: [sampleAssetId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sampleAssetId])
+  @@map("ai_voice_clones")
+}
+
+model AiUsageQuota {
+  id             String      @id @default(uuid())
+  organizationId String?
+  userId         String?
+  type           AiUsageType
+  periodStart    DateTime
+  periodEnd      DateTime
+  quotaLimit     Int
+  quotaUsed      Int         @default(0)
+  overage        Int         @default(0)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId, type, periodStart])
+  @@index([organizationId])
+  @@index([userId])
+  @@map("ai_usage_quotas")
+}
+
+// ===== RENDERING & EXPORT =====
+
+model RenderJob {
+  id                String            @id @default(uuid())
+  projectId         String
+  userId            String
+  organizationId    String?
+  type              RenderJobType
+  status            RenderJobStatus   @default(QUEUED)
+  priority          RenderJobPriority @default(NORMAL)
+  progress          Float             @default(0)
+  workerId          String?
+  format            RenderFormat      @default(MP4)
+  resolution        Resolution        @default(FHD_1080)
+  fps               Int               @default(30)
+  quality           RenderQuality     @default(STANDARD)
+  codec             Codec             @default(H264)
+  bitrate           Int?
+  fileSize          BigInt?
+  outputStorageKey  String?
+  outputCdnUrl      String?
+  startedAt         DateTime?
+  completedAt       DateTime?
+  estimatedDuration Float?
+  actualDuration    Float?
+  errorMessage      String?
+  errorCode         String?
+  retryCount        Int               @default(0)
+  maxRetries        Int               @default(3)
+  metadata          Json?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  project         Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization    Organization?    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  logs            RenderJobLog[]
+  exportHistories ExportHistory[]
+  socialPublishes SocialPublish[]
+
+  @@index([projectId])
+  @@index([userId])
+  @@index([organizationId])
+  @@index([status])
+  @@map("render_jobs")
+}
+
+model RenderJobLog {
+  id          String   @id @default(uuid())
+  renderJobId String
+  level       LogLevel @default(INFO)
+  message     String
+  data        Json?
+  timestamp   DateTime @default(now())
+
+  renderJob RenderJob @relation(fields: [renderJobId], references: [id], onDelete: Cascade)
+
+  @@index([renderJobId])
+  @@map("render_job_logs")
+}
+
+model ExportHistory {
+  id            String       @id @default(uuid())
+  renderJobId   String
+  projectId     String
+  userId        String
+  format        RenderFormat
+  resolution    Resolution
+  fileSize      BigInt?
+  cdnUrl        String
+  downloadCount Int          @default(0)
+  expiresAt     DateTime?
+  createdAt     DateTime     @default(now())
+
+  renderJob       RenderJob       @relation(fields: [renderJobId], references: [id], onDelete: Cascade)
+  project         Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  socialPublishes SocialPublish[]
+
+  @@index([renderJobId])
+  @@index([projectId])
+  @@index([userId])
+  @@map("export_histories")
+}
+
+// ===== SOCIAL PUBLISHING =====
+
+model SocialAccount {
+  id                String              @id @default(uuid())
+  userId            String
+  organizationId    String?
+  platform          SocialPlatform
+  platformAccountId String
+  accountName       String
+  avatarUrl         String?
+  accessToken       String
+  refreshToken      String?
+  tokenExpiresAt    DateTime?
+  scopes            String[]
+  status            SocialAccountStatus @default(CONNECTED)
+  lastSyncedAt      DateTime?
+  metadata          Json?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  publishes    SocialPublish[]
+
+  @@unique([userId, platform, platformAccountId])
+  @@index([userId])
+  @@index([organizationId])
+  @@map("social_accounts")
+}
+
+model SocialPublish {
+  id              String              @id @default(uuid())
+  renderJobId     String?
+  exportHistoryId String?
+  socialAccountId String
+  userId          String
+  projectId       String
+  platform        SocialPlatform
+  platformPostId  String?
+  title           String
+  description     String?
+  tags            String[]
+  visibility      SocialVisibility    @default(PUBLIC)
+  scheduledAt     DateTime?
+  publishedAt     DateTime?
+  status          SocialPublishStatus @default(DRAFT)
+  errorMessage    String?
+  metrics         Json?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  renderJob     RenderJob?     @relation(fields: [renderJobId], references: [id], onDelete: SetNull)
+  exportHistory ExportHistory? @relation(fields: [exportHistoryId], references: [id], onDelete: SetNull)
+  socialAccount SocialAccount  @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([socialAccountId])
+  @@index([userId])
+  @@index([projectId])
+  @@index([status])
+  @@map("social_publishes")
+}
+
+// ===== BILLING & SUBSCRIPTIONS =====
+
+model Plan {
+  id                 String   @id @default(uuid())
+  stripeProductId    String   @unique
+  name               String
+  slug               String   @unique
+  description        String?
+  tier               PlanTier @default(FREE)
+  monthlyPriceInCents Int
+  yearlyPriceInCents Int
+  features           Json?
+  limits             Json
+  isActive           Boolean  @default(true)
+  sortOrder          Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  subscriptions Subscription[]
+
+  @@index([slug])
+  @@map("plans")
+}
+
+model Subscription {
+  id                   String             @id @default(uuid())
+  organizationId       String?            @unique
+  userId               String?            @unique
+  stripeSubscriptionId String             @unique
+  stripeCustomerId     String
+  planId               String
+  status               SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+  canceledAt           DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  metadata             Json?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  organization      Organization?      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user              User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan              Plan               @relation(fields: [planId], references: [id], onDelete: Restrict)
+  invoices          Invoice[]
+  couponRedemptions CouponRedemption[]
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id               String        @id @default(uuid())
+  subscriptionId   String?
+  stripeInvoiceId  String        @unique
+  userId           String
+  organizationId   String?
+  amountInCents    Int
+  currency         String        @default("usd")
+  status           InvoiceStatus @default(DRAFT)
+  paidAt           DateTime?
+  dueDate          DateTime?
+  hostedInvoiceUrl String?
+  pdfUrl           String?
+  lineItems        Json?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  payments     Payment[]
+
+  @@index([subscriptionId])
+  @@index([userId])
+  @@index([organizationId])
+  @@map("invoices")
+}
+
+model Payment {
+  id                    String        @id @default(uuid())
+  invoiceId             String?
+  userId                String
+  organizationId        String?
+  stripePaymentIntentId String?       @unique
+  stripeChargeId        String?
+  amountInCents         Int
+  currency              String        @default("usd")
+  status                PaymentStatus @default(PENDING)
+  method                PaymentMethod @default(CARD)
+  last4                 String?
+  brand                 String?
+  receiptUrl            String?
+  refundedAmountInCents Int           @default(0)
+  metadata              Json?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  invoice      Invoice?      @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@index([userId])
+  @@index([organizationId])
+  @@map("payments")
+}
+
+model Coupon {
+  id             String     @id @default(uuid())
+  stripeCouponId String?    @unique
+  code           String     @unique
+  name           String
+  type           CouponType
+  amountOff      Int?
+  percentOff     Float?
+  currency       String?
+  maxRedemptions Int?
+  timesRedeemed  Int        @default(0)
+  validFrom      DateTime?
+  validUntil     DateTime?
+  isActive       Boolean    @default(true)
+  applicablePlans String[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  redemptions CouponRedemption[]
+
+  @@index([code])
+  @@map("coupons")
+}
+
+model CouponRedemption {
+  id               String   @id @default(uuid())
+  couponId         String
+  userId           String
+  subscriptionId   String?
+  redeemedAt       DateTime @default(now())
+  discountApplied  Int
+  createdAt        DateTime @default(now())
+
+  coupon       Coupon        @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([couponId])
+  @@index([userId])
+  @@map("coupon_redemptions")
+}
+
+// ===== REFERRAL SYSTEM =====
+
+model ReferralCode {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  code          String   @unique
+  totalReferrals Int      @default(0)
+  totalEarnings Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  referrals Referral[]
+
+  @@index([code])
+  @@map("referral_codes")
+}
+
+model Referral {
+  id                 String         @id @default(uuid())
+  referralCodeId     String
+  referredUserId     String         @unique
+  status             ReferralStatus @default(SIGNED_UP)
+  rewardAmountInCents Int            @default(0)
+  rewardPaidAt       DateTime?
+  convertedAt        DateTime?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  referralCode ReferralCode @relation(fields: [referralCodeId], references: [id], onDelete: Cascade)
+  referredUser User         @relation("ReferredUser", fields: [referredUserId], references: [id], onDelete: Cascade)
+
+  @@index([referralCodeId])
+  @@index([status])
+  @@map("referrals")
+}
+
+// ===== COLLABORATION =====
+
+model Comment {
+  id                String        @id @default(uuid())
+  projectId         String
+  userId            String
+  parentId          String?
+  timelineTimestamp Float?
+  content           String
+  attachmentUrl     String?
+  status            CommentStatus @default(ACTIVE)
+  resolvedById      String?
+  resolvedAt        DateTime?
+  editedAt          DateTime?
+  deletedAt         DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  project      Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user         User             @relation("CommentAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  parent       Comment?         @relation("CommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies      Comment[]        @relation("CommentReplies")
+  resolvedBy   User?            @relation("CommentResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+  reactions    CommentReaction[]
+  mentions     CommentMention[]
+
+  @@index([projectId])
+  @@index([userId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+model CommentReaction {
+  id        String   @id @default(uuid())
+  commentId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId, emoji])
+  @@index([commentId])
+  @@map("comment_reactions")
+}
+
+model CommentMention {
+  id        String   @id @default(uuid())
+  commentId String
+  userId    String
+  createdAt DateTime @default(now())
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([commentId])
+  @@index([userId])
+  @@map("comment_mentions")
+}
+
+// ===== SHARING =====
+
+model ShareLink {
+  id            String          @id @default(uuid())
+  projectId     String
+  createdById   String
+  token         String          @unique
+  password      String?
+  permission    SharePermission @default(VIEW)
+  allowDownload Boolean         @default(false)
+  expiresAt     DateTime?
+  maxViews      Int?
+  viewCount     Int             @default(0)
+  isActive      Boolean         @default(true)
+  lastAccessedAt DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator     User              @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  accesses    ShareLinkAccess[]
+
+  @@index([projectId])
+  @@index([token])
+  @@map("share_links")
+}
+
+model ShareLinkAccess {
+  id              String   @id @default(uuid())
+  shareLinkId     String
+  accessedByUserId String?
+  ipAddress       String?
+  userAgent       String?
+  accessedAt      DateTime @default(now())
+
+  shareLink      ShareLink @relation(fields: [shareLinkId], references: [id], onDelete: Cascade)
+  accessedByUser User?     @relation(fields: [accessedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([shareLinkId])
+  @@map("share_link_accesses")
+}
+
+// ===== NOTIFICATIONS =====
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?
+  readAt    DateTime?
+  actionUrl String?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([readAt])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id              String                      @id @default(uuid())
+  userId          String                      @unique
+  emailEnabled    Boolean                     @default(true)
+  pushEnabled     Boolean                     @default(true)
+  inAppEnabled    Boolean                     @default(true)
+  digestFrequency NotificationDigestFrequency @default(REALTIME)
+  mutedTypes      String[]
+  createdAt       DateTime                    @default(now())
+  updatedAt       DateTime                    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+// ===== ACTIVITY & AUDIT =====
+
+model ActivityLog {
+  id             String         @id @default(uuid())
+  userId         String?
+  organizationId String?
+  projectId      String?
+  action         ActivityAction
+  resourceType   String?
+  resourceId     String?
+  metadata       Json?
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime       @default(now())
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([projectId])
+  @@map("activity_logs")
+}
+
+model AuditLog {
+  id             String   @id @default(uuid())
+  userId         String?
+  organizationId String?
+  action         String
+  resourceType   String
+  resourceId     String
+  previousData   Json?
+  newData        Json?
+  ipAddress      String?
+  userAgent      String?
+  sessionId      String?
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([resourceType, resourceId])
+  @@map("audit_logs")
+}
+
+// ===== SYSTEM =====
+
+model WebhookEndpoint {
+  id             String        @id @default(uuid())
+  organizationId String
+  url            String
+  secret         String
+  events         String[]
+  status         WebhookStatus @default(ACTIVE)
+  failureCount   Int           @default(0)
+  lastTriggeredAt DateTime?
+  lastSuccessAt  DateTime?
+  lastFailureAt  DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  logs         WebhookLog[]
+
+  @@index([organizationId])
+  @@map("webhook_endpoints")
+}
+
+model WebhookLog {
+  id                String    @id @default(uuid())
+  webhookEndpointId String
+  event             String
+  payload           Json
+  responseStatus    Int?
+  responseBody      String?
+  deliveredAt       DateTime?
+  createdAt         DateTime  @default(now())
+
+  endpoint WebhookEndpoint @relation(fields: [webhookEndpointId], references: [id], onDelete: Cascade)
+
+  @@index([webhookEndpointId])
+  @@map("webhook_logs")
+}
+
+model ErrorLog {
+  id           String      @id @default(uuid())
+  userId       String?
+  level        ErrorLevel  @default(ERROR)
+  source       ErrorSource
+  message      String
+  stack        String?
+  context      Json?
+  resolved     Boolean     @default(false)
+  resolvedAt   DateTime?
+  resolvedById String?
+  createdAt    DateTime    @default(now())
+
+  @@index([level])
+  @@index([source])
+  @@index([resolved])
+  @@map("error_logs")
+}
+
+model SystemSetting {
+  id          String                @id @default(uuid())
+  key         String                @unique
+  value       Json
+  category    SystemSettingCategory @default(GENERAL)
+  description String?
+  isPublic    Boolean               @default(false)
+  updatedById String?
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  @@index([category])
+  @@map("system_settings")
+}
+
+model FeatureFlag {
+  id                   String   @id @default(uuid())
+  key                  String   @unique
+  name                 String
+  description          String?
+  enabled              Boolean  @default(false)
+  rolloutPercentage    Float    @default(0)
+  targetUserIds        String[]
+  targetOrganizationIds String[]
+  config               Json?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@map("feature_flags")
+}
+
+model RateLimit {
+  id          String         @id @default(uuid())
+  key         String         @unique
+  description String?
+  windowMs    Int
+  maxRequests Int
+  scope       RateLimitScope @default(GLOBAL)
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@map("rate_limits")
+}
+
+// ===== ANALYTICS & SEARCH =====
+
+model AnalyticsEvent {
+  id             String          @id @default(uuid())
+  userId         String?
+  organizationId String?
+  projectId      String?
+  event          String
+  properties     Json?
+  sessionId      String?
+  source         AnalyticsSource @default(WEB)
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime        @default(now())
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([projectId])
+  @@index([event])
+  @@map("analytics_events")
+}
+
+model SearchHistory {
+  id          String   @id @default(uuid())
+  userId      String
+  query       String
+  filters     Json?
+  resultCount Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@map("search_histories")
+}
+
+model TrendingTopic {
+  id               String   @id @default(uuid())
+  topic            String   @unique
+  category         String?
+  score            Float    @default(0)
+  mentionCount     Int      @default(0)
+  region           String?
+  lastCalculatedAt DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([score(sort: Desc)])
+  @@map("trending_topics")
+}
+
+// ===== USER PREFERENCES =====
+
+model Favorite {
+  id           String               @id @default(uuid())
+  userId       String
+  resourceType FavoriteResourceType
+  resourceId   String
+  createdAt    DateTime             @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, resourceType, resourceId])
+  @@index([userId])
+  @@map("favorites")
+}
+
+model Collection {
+  id             String    @id @default(uuid())
+  userId         String
+  workspaceId    String?
+  name           String
+  description    String?
+  coverImageUrl  String?
+  isPublic       Boolean   @default(false)
+  deletedAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace?       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  items     CollectionItem[]
+
+  @@index([userId])
+  @@index([workspaceId])
+  @@map("collections")
+}
+
+model CollectionItem {
+  id           String                 @id @default(uuid())
+  collectionId String
+  resourceType CollectionResourceType
+  resourceId   String
+  sortOrder    Int
+  addedAt      DateTime               @default(now())
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, resourceType, resourceId])
+  @@index([collectionId])
+  @@map("collection_items")
+}
+
+model Tag {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  slug       String   @unique
+  usageCount Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([slug])
+  @@map("tags")
+}
+
+model RecentlyOpened {
+  id           String   @id @default(uuid())
+  userId       String
+  resourceType String
+  resourceId   String
+  lastOpenedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, resourceType, resourceId])
+  @@index([userId])
+  @@map("recently_opened")
+}
+
+// ===== STORAGE TRACKING =====
+
+model StorageUsage {
+  id               String    @id @default(uuid())
+  organizationId   String?   @unique
+  userId           String?   @unique
+  totalBytes       BigInt    @default(0)
+  imageBytes       BigInt    @default(0)
+  videoBytes       BigInt    @default(0)
+  audioBytes       BigInt    @default(0)
+  otherBytes       BigInt    @default(0)
+  assetCount       Int       @default(0)
+  lastCalculatedAt DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("storage_usages")
+}
+
+// ===== VERSION HISTORY =====
+
+model VersionHistory {
+  id                    String   @id @default(uuid())
+  projectId             String
+  userId                String
+  version               Int
+  snapshotData          Json
+  changeDescription     String?
+  restoredFromVersionId String?
+  createdAt             DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([userId])
+  @@map("version_histories")
+}
