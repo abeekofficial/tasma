@@ -252,6 +252,20 @@ export class PipelineBuilder {
   }
 
   /**
+   * Adds subtitles to the video using an ASS file.
+   */
+  public addSubtitles(assFilePath: string): this {
+    const outStream = this.filterGraph.generateStreamName('ass');
+    const options: Record<string, string> = {
+      filename: assFilePath
+    };
+    
+    this.filterGraph.addFilter('ass', [this.currentVideoStream], [outStream], options);
+    this.currentVideoStream = outStream;
+    return this;
+  }
+
+  /**
    * Executes the pipeline.
    */
   public execute(): Promise<void> {

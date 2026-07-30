@@ -28,3 +28,8 @@ export * from './managers/frame-cache.manager';
 export * from './performance/resource.monitor';
 export * from './performance/benchmark.service';
 export * from './performance/performance.engine';
+export * from './subtitles/parsers/srt.parser';
+export * from './subtitles/parsers/vtt.parser';
+export * from './subtitles/serializers/ass.serializer';
+export * from './subtitles/subtitle.operations';
+export * from './subtitles/providers/provider.interfaces';
