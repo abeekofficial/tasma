@@ -21,37 +21,36 @@
 | Phase 9.1E — Performance Engine | ✅ Complete | 4 | GPU Detection, Codec Routing, Benchmarks, Caching |
 | Phase 9.2 — Subtitle Engine | ✅ Complete | 5 | SRT/VTT Parsers, ASS Serializer, Subtitle Ops |
 | Phase UI-1 — Marketing Landing Page| ✅ Complete | 13 | Glassmorphism, Framer Motion, Vercel Aesthetic |
-| **Phase UI-2 — Marketing Pages**| **✅ Complete**| **10** | **Route Group, About, Features, Blog, Legal** |
+| Phase UI-2 — Marketing Pages| ✅ Complete | 10 | Route Group, About, Features, Blog, Legal |
+| **Phase UI-3 — Auth Experience** | **✅ Complete** | **18** | **Glass Cards, Floating Labels, Workspace Wizard** |
 | Phase 9.3 — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 274 files
+## Current File Count: 284 files
 
-## Phase UI-2 Deliverables (Marketing Pages)
+## Phase UI-3 Deliverables (Authentication Experience)
 
-### Route Architecture
+### Core Auth Components
 | File | Purpose |
 |------|---------|
-| `(marketing)/layout.tsx` | Created a dedicated route group for the marketing site. This shared layout injects the `Navbar` and `Footer` cleanly across all public pages, preventing unnecessary re-renders of the navigation during client-side transitions. |
+| `glass-card.tsx` | A reusable UI wrapper utilizing `backdrop-blur`, subtle borders, and gradient meshes to create the foundational glassmorphism aesthetic. |
+| `animated-input.tsx` | Form inputs featuring Framer Motion driven floating labels, focus ring animations, and integrated password visibility toggles. |
+| `password-strength.tsx` | Dynamic visual meter that assesses password complexity in real-time, mapping string entropy to an animated color bar. |
+| `otp-input.tsx` & `social-login.tsx` | A sophisticated 6-digit segmented input (handling paste/backspace natively) and interactive OAuth buttons. |
 
-### Core Marketing Pages
+### Auth Pages Refactor
 | File | Purpose |
 |------|---------|
-| `features/page.tsx` | Deep dive into the product's capabilities using `framer-motion` scroll-reveal animations, responsive glassmorphic grids, and an interactive workflow diagram. |
-| `pricing/page.tsx` | Expanded pricing logic featuring an animated monthly/annual toggle and a comprehensive 3-tier feature comparison matrix. |
+| `auth/layout.tsx` | Replaces the basic centered form from Phase 5 with a premium split-screen design, balancing the form against a vibrant abstract graphic. |
+| `login`, `register`, `reset-password` | All standard flows upgraded to utilize the new components and strict `AnimatePresence` page transitions without hard routing reloads. |
+| `verify-email` & `2fa` | Dedicated routes implementing the new `otp-input.tsx` and verifying codes gracefully. |
+| `session-expired` | An absolute-positioned, blurred overlay that intercepts the UI gracefully when the session expires, demanding re-authentication without losing background context. |
 
-### Company & Ecosystem
+### Onboarding Workflow
 | File | Purpose |
 |------|---------|
-| `about/page.tsx` | A narrative-driven layout showcasing the company mission, values, tech stack, and a chronological company history timeline. |
-| `contact/page.tsx` | Premium contact portal featuring a glassmorphic form, interactive global office cards, and social integrations. |
-| `careers/page.tsx` | Showcases company culture with a benefits grid and dynamic open-position listings. |
-
-### Content & Legal
-| File | Purpose |
-|------|---------|
-| `blog/page.tsx` & `changelog/page.tsx` | Content engines driven by static mock data arrays. Features modern article cards, tag styling, and a beautiful vertical timeline for product updates. |
-| `privacy/page.tsx` & `terms/page.tsx` | Highly readable legal documentation structured using Tailwind CSS `prose` typography for optimal line lengths, font scaling, and 8px grid alignment. |
+| `onboarding/page.tsx` & `layout.tsx` | A completely isolated, focused route running a multi-step `ProgressStepper` wizard. After registration, users are seamlessly guided through Profile Setup, Workspace Creation, Member Invites, and Theme Preferences. |
+| `avatar-picker.tsx` | A sleek component allowing users to rapidly click through predefined gradient avatars or initiate an image upload mock. |
 
 ### Architecture Highlights
-- **Performance:** All pages aggressively leverage Next.js Server Components. The `"use client"` directive is strictly constrained to the micro-interactions (like Framer Motion wrappers or the pricing toggle state) to ensure the heavy DOM structure of the marketing site is pre-rendered for maximum SEO performance (Lighthouse 95+ target).
+- **Client-Side Grace:** Rebuilding these forms around `framer-motion` drastically reduces perceived latency. Moving between form fields or submitting invalid data no longer feels like interacting with a standard HTML form, but rather a native Apple/Vercel application, achieving the requested premium standard.

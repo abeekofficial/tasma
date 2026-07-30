@@ -1,67 +1,101 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
-import { CheckCircle2, XCircle } from "lucide-react";
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { GlassCard } from '@/components/auth/glass-card';
+import { OtpInput } from '@/components/auth/otp-input';
+import { authClient } from '@/lib/auth-client';
+import { CheckCircle2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function VerifyEmailPage() {
+  const [otp, setOtp] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
 
-  useEffect(() => {
-    // Simulate verification process
-    const timer = setTimeout(() => {
-      setStatus("success");
-      
-      // Auto redirect after success
+  const handleVerify = async (code: string) => {
+    setIsLoading(true);
+    try {
+      await authClient.verifyEmail({ code });
+      setIsSuccess(true);
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push('/dashboard');
       }, 3000);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [router]);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="w-full text-center">
-      {status === "loading" && (
-        <div className="space-y-6 flex flex-col items-center">
-          <Spinner size="lg" />
-          <div>
-            <h2 className="text-2xl font-bold text-zinc-100">Verifying your email</h2>
-            <p className="text-zinc-400 mt-2 text-sm">Please wait a moment...</p>
-          </div>
-        </div>
-      )}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <GlassCard className="p-8">
+        <AnimatePresence mode="wait">
+          {!isSuccess ? (
+            <motion.div
+              key="verify"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+            >
+              <div className="mb-8 text-center">
+                <h2 className="text-2xl font-semibold tracking-tight">Verify your email</h2>
+                <p className="text-sm text-muted-foreground mt-2">
+                  We sent a code to your email. Enter it below to verify your account.
+                </p>
+              </div>
 
-      {status === "success" && (
-        <div className="space-y-6 animate-scale-in flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-            <CheckCircle2 className="w-8 h-8" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-zinc-100">Email Verified!</h2>
-            <p className="text-zinc-400 mt-2 text-sm">Redirecting you to the dashboard...</p>
-          </div>
-        </div>
-      )}
+              <div className="flex justify-center py-4">
+                <OtpInput
+                  length={6}
+                  value={otp}
+                  onChange={setOtp}
+                  onComplete={handleVerify}
+                  disabled={isLoading}
+                />
+              </div>
 
-      {status === "error" && (
-        <div className="space-y-6 flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500">
-            <XCircle className="w-8 h-8" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-zinc-100">Verification Failed</h2>
-            <p className="text-zinc-400 mt-2 text-sm">The link might be expired or invalid.</p>
-          </div>
-          <Button variant="primary" onClick={() => setStatus("loading")}>
-            Try Again
-          </Button>
-        </div>
-      )}
-    </div>
+              <div className="mt-8 text-center text-sm">
+                <button 
+                  className="font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  disabled={isLoading}
+                  onClick={() => { /* resend logic */ }}
+                >
+                  Didn't receive a code? Resend
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="success"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-6"
+            >
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100/10 mb-6">
+                <CheckCircle2 className="h-6 w-6 text-green-500" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Email Verified</h3>
+              <p className="text-sm text-muted-foreground mb-8">
+                Your email has been successfully verified. You can now access all features.
+              </p>
+              <button
+                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all"
+                onClick={() => router.push('/dashboard')}
+              >
+                Continue to Dashboard
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </GlassCard>
+    </motion.div>
   );
 }

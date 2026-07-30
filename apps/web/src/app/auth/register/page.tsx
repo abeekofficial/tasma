@@ -1,142 +1,101 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { signUp } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { PasswordStrength } from "@/components/auth/password-strength";
-import { OAuthButtons } from "@/components/auth/oauth-buttons";
-import { toast } from "sonner";
-import { z } from "zod";
-
-const registerSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string(),
-  terms: z.boolean().refine((val) => val === true, "You must accept the terms"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { GlassCard } from '@/components/auth/glass-card';
+import { AnimatedInput } from '@/components/auth/animated-input';
+import { SocialLogin } from '@/components/auth/social-login';
+import { authClient } from '@/lib/auth-client';
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({ 
-    name: "", email: "", password: "", confirmPassword: "", terms: false 
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
-    
-    const result = registerSchema.safeParse(formData);
-    if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      result.error.issues.forEach(issue => {
-        fieldErrors[issue.path[0]] = issue.message;
-      });
-      setErrors(fieldErrors);
-      return;
-    }
-
-    setLoading(true);
+    setIsLoading(true);
     try {
-      await signUp.email({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-      });
-      toast.success("Account created! Please check your email.");
-      router.push("/auth/verify-email");
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to create account.");
+      await authClient.signUp.email({ email, password, name });
+    } catch (error) {
+      console.error(error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-full">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-zinc-100">Create your account</h2>
-        <p className="text-zinc-400 mt-2 text-sm">Join Tasma and start creating today</p>
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <GlassCard className="p-8">
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold tracking-tight">Create an account</h2>
+          <p className="text-sm text-muted-foreground mt-2">Enter your details below to get started</p>
+        </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
-          label="Full Name"
-          placeholder="John Doe"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          error={errors.name}
-        />
-        <Input
-          label="Email address"
-          type="email"
-          placeholder="you@example.com"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          error={errors.email}
-        />
-        
-        <div>
-          <Input
-            label="Password"
-            type="password"
-            placeholder="••••••••"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            error={errors.password}
+        <form onSubmit={handleRegister} className="space-y-4">
+          <AnimatedInput
+            id="name"
+            type="text"
+            label="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
           />
-          <PasswordStrength password={formData.password} />
+          <AnimatedInput
+            id="email"
+            type="email"
+            label="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <AnimatedInput
+            id="password"
+            type="password"
+            label="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all mt-6"
+          >
+            {isLoading ? 'Creating account...' : 'Create Account'}
+          </button>
+        </form>
+
+        <div className="mt-6">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-background/80 text-muted-foreground backdrop-blur-sm">Or sign up with</span>
+            </div>
+          </div>
+          
+          <div className="mt-6">
+            <SocialLogin />
+          </div>
         </div>
-
-        <Input
-          label="Confirm Password"
-          type="password"
-          placeholder="••••••••"
-          value={formData.confirmPassword}
-          onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-          error={errors.confirmPassword}
-        />
-
-        <div className="pt-2">
-          <label className="flex items-start gap-2 text-sm text-zinc-400 cursor-pointer">
-            <input
-              type="checkbox"
-              className="mt-1 rounded border-zinc-700 bg-zinc-900 text-violet-500 focus:ring-violet-500/20"
-              checked={formData.terms}
-              onChange={(e) => setFormData({ ...formData, terms: e.target.checked })}
-            />
-            <span>
-              I agree to the <Link href="/terms" className="text-violet-400 hover:underline">Terms of Service</Link> and <Link href="/privacy" className="text-violet-400 hover:underline">Privacy Policy</Link>
-            </span>
-          </label>
-          {errors.terms && <p className="text-xs text-rose-500 mt-1">{errors.terms}</p>}
-        </div>
-
-        <Button type="submit" variant="primary" fullWidth isLoading={loading} className="mt-4">
-          Create Account
-        </Button>
-      </form>
-
-      <div className="my-6 flex items-center gap-4 before:h-px before:flex-1 before:bg-zinc-800 after:h-px after:flex-1 after:bg-zinc-800">
-        <span className="text-xs text-zinc-500 uppercase">or register with</span>
-      </div>
-
-      <OAuthButtons />
-
-      <p className="text-center text-sm text-zinc-400 mt-8">
-        Already have an account?{" "}
-        <Link href="/auth/login" className="text-violet-400 hover:text-violet-300 font-medium">
-          Sign in
-        </Link>
-      </p>
-    </div>
+        
+        <p className="mt-8 text-center text-sm text-muted-foreground">
+          Already have an account?{' '}
+          <Link href="/auth/login" className="font-medium text-primary hover:underline underline-offset-4">
+            Sign in
+          </Link>
+        </p>
+      </GlassCard>
+    </motion.div>
   );
 }
