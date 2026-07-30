@@ -20,42 +20,38 @@
 | Phase 9.1D — Audio Processing | ✅ Complete | 4 | EQ, Comp, Voice Enhancements, A/V Sync |
 | Phase 9.1E — Performance Engine | ✅ Complete | 4 | GPU Detection, Codec Routing, Benchmarks, Caching |
 | Phase 9.2 — Subtitle Engine | ✅ Complete | 5 | SRT/VTT Parsers, ASS Serializer, Subtitle Ops |
-| **Phase UI-1 — Marketing Landing Page**| **✅ Complete**| **13** | **Glassmorphism, Framer Motion, Vercel Aesthetic** |
+| Phase UI-1 — Marketing Landing Page| ✅ Complete | 13 | Glassmorphism, Framer Motion, Vercel Aesthetic |
+| **Phase UI-2 — Marketing Pages**| **✅ Complete**| **10** | **Route Group, About, Features, Blog, Legal** |
 | Phase 9.3 — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 264 files
+## Current File Count: 274 files
 
-## Phase UI-1 Deliverables (Marketing Landing Page)
+## Phase UI-2 Deliverables (Marketing Pages)
 
-### Layout & Animation Infrastructure
+### Route Architecture
 | File | Purpose |
 |------|---------|
-| `layout.tsx` | Retrofitted the root layout with comprehensive SEO metadata, OpenGraph tags, Twitter Cards, and `scroll-smooth` behavior specifically tailored for SaaS marketing indexability. |
-| `page.tsx` | The primary Server Component orchestrating the massive landing page by stitching together heavily optimized Client Component "islands". |
-| `animations.ts` | Centralized repository of Framer Motion variants (`fadeUp`, `staggerContainer`) ensuring a unified, ultra-smooth Apple-level feel across all sections. |
+| `(marketing)/layout.tsx` | Created a dedicated route group for the marketing site. This shared layout injects the `Navbar` and `Footer` cleanly across all public pages, preventing unnecessary re-renders of the navigation during client-side transitions. |
 
-### Navigation & Footer
+### Core Marketing Pages
 | File | Purpose |
 |------|---------|
-| `navbar.tsx` | A sticky, glassmorphic header (`backdrop-blur`) featuring interactive Mega Menus and Framer Motion powered CTA buttons. |
-| `footer.tsx` | A massive, structured sitemap footer organizing links into Product, Resources, Company, and Legal silos to maximize internal SEO crawling. |
+| `features/page.tsx` | Deep dive into the product's capabilities using `framer-motion` scroll-reveal animations, responsive glassmorphic grids, and an interactive workflow diagram. |
+| `pricing/page.tsx` | Expanded pricing logic featuring an animated monthly/annual toggle and a comprehensive 3-tier feature comparison matrix. |
 
-### Core Marketing Sections
+### Company & Ecosystem
 | File | Purpose |
 |------|---------|
-| `hero.tsx` | High-conversion entry point featuring glowing gradient typography, 3D abstract background elements, and clear primary/secondary CTAs. |
-| `features.tsx` | Vercel-inspired bento-box grid utilizing `lucide-react` icons and glassmorphic cards to highlight the timeline, AI, and GPU acceleration. |
-| `workflow.tsx` | Step-by-step visual narrative utilizing `whileInView` scroll-reveal animations to explain the "Idea to Export" journey. |
-| `integrations.tsx` | Infinite horizontal scrolling logo carousel (marquee) for social proof and ecosystem integrations. |
+| `about/page.tsx` | A narrative-driven layout showcasing the company mission, values, tech stack, and a chronological company history timeline. |
+| `contact/page.tsx` | Premium contact portal featuring a glassmorphic form, interactive global office cards, and social integrations. |
+| `careers/page.tsx` | Showcases company culture with a benefits grid and dynamic open-position listings. |
 
-### Interactive & Conversion Sections
+### Content & Legal
 | File | Purpose |
 |------|---------|
-| `ai-demo.tsx` | Interactive React island that simulates the AI prompt generation experience right on the landing page, driving immediate user engagement. |
-| `video-showcase.tsx` | Beautiful structural wrapper for a promotional video, backed by high-quality Unsplash imagery (avoiding cheap gray placeholders). |
-| `pricing.tsx` & `comparison-table.tsx` | Animated monthly/yearly toggle switches revealing highly-styled pricing tiers (with "Pro" gradient highlights) and an exhaustive feature comparison matrix. |
-| `testimonials.tsx` & `faq.tsx` | Masonry grid of social proof cards and a fully accessible Accordion FAQ powered by `AnimatePresence` for buttery smooth collapsing. |
+| `blog/page.tsx` & `changelog/page.tsx` | Content engines driven by static mock data arrays. Features modern article cards, tag styling, and a beautiful vertical timeline for product updates. |
+| `privacy/page.tsx` & `terms/page.tsx` | Highly readable legal documentation structured using Tailwind CSS `prose` typography for optimal line lengths, font scaling, and 8px grid alignment. |
 
 ### Architecture Highlights
-- **Server/Client Boundary Mastery:** By strictly keeping the `page.tsx` as a Server Component and only sprinkling `"use client"` within the specific animated sections in `components/marketing/`, we guarantee that the initial payload is lightning fast and highly indexable by Googlebot, crucial for a SaaS landing page.
+- **Performance:** All pages aggressively leverage Next.js Server Components. The `"use client"` directive is strictly constrained to the micro-interactions (like Framer Motion wrappers or the pricing toggle state) to ensure the heavy DOM structure of the marketing site is pre-rendered for maximum SEO performance (Lighthouse 95+ target).
