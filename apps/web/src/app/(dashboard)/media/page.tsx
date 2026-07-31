@@ -1,179 +1,287 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Search, Folder, File as FileIcon, Image as ImageIcon, Video, Music, Type, SortAsc, Trash2, MoveRight, Upload } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { UploadZone } from '@/components/media/upload-zone';
+import React, { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const MOCK_MEDIA = [
-  { id: '1', name: 'background-loop.mp4', type: 'video', size: '12.5 MB', date: 'Oct 24, 2023', thumbnail: 'bg-blue-500/20 text-blue-400' },
-  { id: '2', name: 'epic-whoosh.wav', type: 'audio', size: '1.2 MB', date: 'Oct 23, 2023', thumbnail: 'bg-emerald-500/20 text-emerald-400' },
-  { id: '3', name: 'logo-transparent.png', type: 'image', size: '450 KB', date: 'Oct 20, 2023', thumbnail: 'bg-pink-500/20 text-pink-400' },
-  { id: '4', name: 'Inter-Bold.ttf', type: 'font', size: '800 KB', date: 'Oct 15, 2023', thumbnail: 'bg-zinc-500/20 text-zinc-400' },
+import { FolderSidebar } from '@/components/media/folder-sidebar';
+import { MediaToolbar } from '@/components/media/media-toolbar';
+import { MediaCard } from '@/components/media/media-card';
+import { UploadQueuePanel } from '@/components/media/upload-queue-panel';
+import { MediaPreviewModal } from '@/components/media/media-preview-modal';
+import { SelectionToolbar } from '@/components/media/selection-toolbar';
+
+export type MediaType = 'video' | 'image' | 'audio' | 'document';
+
+export interface MediaItem {
+  id: string;
+  name: string;
+  type: MediaType;
+  url: string;
+  thumbnailUrl?: string;
+  size: number; // bytes
+  createdAt: string;
+  duration?: number; // seconds
+  resolution?: string;
+  codec?: string;
+}
+
+const MOCK_MEDIA: MediaItem[] = [
+  {
+    id: 'm-101',
+    name: 'hero-background-loop.mp4',
+    type: 'video',
+    url: '/assets/hero-background-loop.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600&auto=format&fit=crop',
+    size: 24500000,
+    createdAt: '2026-07-20T14:30:00Z',
+    duration: 15.4,
+    resolution: '3840x2160',
+    codec: 'H.264',
+  },
+  {
+    id: 'm-102',
+    name: 'brand-logo-light.svg',
+    type: 'image',
+    url: '/assets/brand-logo-light.svg',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=600&auto=format&fit=crop',
+    size: 45000,
+    createdAt: '2026-07-21T09:15:00Z',
+    resolution: '800x800',
+  },
+  {
+    id: 'm-103',
+    name: 'podcast-intro-season3.wav',
+    type: 'audio',
+    url: '/assets/podcast-intro-season3.wav',
+    size: 14200000,
+    createdAt: '2026-07-22T11:45:00Z',
+    duration: 45.2,
+    codec: 'PCM (Lossless)',
+  },
+  {
+    id: 'm-104',
+    name: 'product-demo-v2-final.webm',
+    type: 'video',
+    url: '/assets/product-demo-v2-final.webm',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop',
+    size: 85600000,
+    createdAt: '2026-07-25T16:20:00Z',
+    duration: 124.8,
+    resolution: '3840x2160',
+    codec: 'VP9',
+  },
+  {
+    id: 'm-105',
+    name: 'team-retreat-2026.jpg',
+    type: 'image',
+    url: '/assets/team-retreat-2026.jpg',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=600&auto=format&fit=crop',
+    size: 4200000,
+    createdAt: '2026-07-28T10:05:00Z',
+    resolution: '6000x4000',
+  },
+  {
+    id: 'm-106',
+    name: 'b-roll-cityscape.mov',
+    type: 'video',
+    url: '/assets/b-roll-cityscape.mov',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=600&auto=format&fit=crop',
+    size: 450000000,
+    createdAt: '2026-07-29T08:30:00Z',
+    duration: 32.5,
+    resolution: '3840x2160',
+    codec: 'ProRes 422',
+  },
+  {
+    id: 'm-107',
+    name: 'app-notification-chime.mp3',
+    type: 'audio',
+    url: '/assets/app-notification-chime.mp3',
+    size: 150000,
+    createdAt: '2026-07-29T14:10:00Z',
+    duration: 1.2,
+    codec: 'MP3 320kbps',
+  },
+  {
+    id: 'm-108',
+    name: 'brand-guidelines-q3.pdf',
+    type: 'document',
+    url: '/assets/brand-guidelines-q3.pdf',
+    size: 12400000,
+    createdAt: '2026-07-30T09:00:00Z',
+  },
+  {
+    id: 'm-109',
+    name: 'social-banner-summer-campaign.png',
+    type: 'image',
+    url: '/assets/social-banner-summer-campaign.png',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&auto=format&fit=crop',
+    size: 2100000,
+    createdAt: '2026-07-30T11:25:00Z',
+    resolution: '1200x630',
+  },
+  {
+    id: 'm-110',
+    name: 'founder-interview-raw-camA.mp4',
+    type: 'video',
+    url: '/assets/founder-interview-raw-camA.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?q=80&w=600&auto=format&fit=crop',
+    size: 1250000000,
+    createdAt: '2026-07-30T15:45:00Z',
+    duration: 1845.0,
+    resolution: '1920x1080',
+    codec: 'H.264',
+  },
+  {
+    id: 'm-111',
+    name: 'dashboard-ui-screenshot-dark.png',
+    type: 'image',
+    url: '/assets/dashboard-ui-screenshot-dark.png',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600&auto=format&fit=crop',
+    size: 3800000,
+    createdAt: '2026-07-31T08:15:00Z',
+    resolution: '2880x1800',
+  },
+  {
+    id: 'm-112',
+    name: 'ambient-background-music.m4a',
+    type: 'audio',
+    url: '/assets/ambient-background-music.m4a',
+    size: 6500000,
+    createdAt: '2026-07-31T09:30:00Z',
+    duration: 185.6,
+    codec: 'AAC 256kbps',
+  }
 ];
 
 export default function MediaLibraryPage() {
-  const [search, setSearch] = useState('');
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [showUpload, setShowUpload] = useState(false);
+  const [selectedMediaIds, setSelectedMediaIds] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [previewMediaId, setPreviewMediaId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFolder, setActiveFolder] = useState('all');
 
-  const toggleSelect = (id: string) => {
-    const newSet = new Set(selectedIds);
-    if (newSet.has(id)) newSet.delete(id);
-    else newSet.add(id);
-    setSelectedIds(newSet);
-  };
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  }, []);
 
-  const selectAll = () => {
-    if (selectedIds.size === MOCK_MEDIA.length) {
-      setSelectedIds(newSet => new Set());
-    } else {
-      setSelectedIds(new Set(MOCK_MEDIA.map(m => m.id)));
-    }
-  };
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    setIsDragging(false);
+  }, []);
 
-  const getIconForType = (type: string) => {
-    switch (type) {
-      case 'video': return <Video className="w-6 h-6" />;
-      case 'audio': return <Music className="w-6 h-6" />;
-      case 'image': return <ImageIcon className="w-6 h-6" />;
-      case 'font': return <Type className="w-6 h-6" />;
-      default: return <FileIcon className="w-6 h-6" />;
-    }
-  };
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    // Future: handle files from e.dataTransfer.files
+  }, []);
+
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedMediaIds(prev => 
+      prev.includes(id) ? prev.filter(mediaId => mediaId !== id) : [...prev, id]
+    );
+  }, []);
+
+  const clearSelection = useCallback(() => setSelectedMediaIds([]), []);
+
+  const filteredMedia = MOCK_MEDIA.filter(media => 
+    media.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const previewMedia = previewMediaId 
+    ? MOCK_MEDIA.find(m => m.id === previewMediaId) 
+    : null;
 
   return (
-    <div className="flex h-full animate-fade-in overflow-hidden -m-4 sm:-m-8">
-      {/* Sidebar Folders */}
-      <div className="w-64 border-r border-zinc-800 bg-zinc-950/50 p-4 hidden md:flex flex-col">
-        <div className="mb-6">
-          <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3">Folders</h2>
-          <nav className="space-y-1">
-            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-900 text-zinc-100 text-sm font-medium">
-              <Folder className="w-4 h-4 text-violet-400" fill="currentColor" />
-              All Media
-            </button>
-            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-zinc-400 hover:bg-zinc-900/50 hover:text-zinc-200 text-sm transition-colors">
-              <Folder className="w-4 h-4" />
-              Project Assets
-            </button>
-            <button className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-zinc-400 hover:bg-zinc-900/50 hover:text-zinc-200 text-sm transition-colors">
-              <Folder className="w-4 h-4" />
-              Brand Kit
-            </button>
-          </nav>
-        </div>
-        <Button variant="outline" size="sm" className="mt-auto w-full border-dashed border-zinc-700">
-          <Plus className="w-4 h-4 mr-2" /> New Folder
-        </Button>
-      </div>
+    <div className="flex h-screen w-full overflow-hidden bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 font-sans selection:bg-blue-500/30">
+      <FolderSidebar 
+        activeFolder={activeFolder}
+        onFolderSelect={setActiveFolder}
+      />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col p-4 sm:p-8 overflow-y-auto">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-zinc-100">Media Library</h1>
-            <p className="text-sm text-zinc-400">Manage your assets, videos, and fonts.</p>
-          </div>
-          <Button onClick={() => setShowUpload(!showUpload)}>
-            <Upload className="w-4 h-4 mr-2" />
-            Upload Assets
-          </Button>
-        </div>
+      <main 
+        className="flex-1 flex flex-col relative min-w-0 bg-zinc-50/50 dark:bg-zinc-950/50"
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        <AnimatePresence>
+          {isDragging && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-4 z-50 rounded-3xl border-2 border-dashed border-blue-500 bg-blue-500/5 dark:bg-blue-500/10 backdrop-blur-[2px] flex items-center justify-center pointer-events-none"
+            >
+              <div className="text-blue-600 dark:text-blue-400 font-medium text-lg flex items-center gap-3 shadow-lg bg-white/90 dark:bg-zinc-900/90 px-8 py-4 rounded-full backdrop-blur-md border border-blue-500/20">
+                <svg className="w-6 h-6 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                Drop files to upload
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {showUpload && (
-          <div className="mb-8 animate-scale-in">
-            <UploadZone 
-              onUpload={(files) => console.log('Uploading:', files)} 
-              maxSize={50 * 1024 * 1024} 
-            />
-          </div>
-        )}
+        <MediaToolbar 
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onUploadClick={() => {/* trigger upload */}}
+        />
 
-        {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
-          <div className="flex-1 w-full relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-            <Input 
-              placeholder="Search files..." 
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 w-full sm:max-w-md bg-zinc-900/50"
-            />
-          </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Button variant="outline" size="sm" className="bg-zinc-900/50">
-              <SortAsc className="w-4 h-4 mr-2" /> Sort
-            </Button>
-          </div>
-        </div>
-
-        {selectedIds.size > 0 && (
-          <div className="mb-4 p-3 glass rounded-lg border border-violet-500/30 flex items-center justify-between animate-fade-in">
-            <span className="text-sm font-medium text-violet-200">
-              {selectedIds.size} item{selectedIds.size > 1 ? 's' : ''} selected
-            </span>
-            <div className="flex gap-2">
-              <Button variant="secondary" size="sm" className="bg-zinc-800 hover:bg-zinc-700">
-                <MoveRight className="w-4 h-4 mr-2" /> Move
-              </Button>
-              <Button variant="destructive" size="sm">
-                <Trash2 className="w-4 h-4 mr-2" /> Delete
-              </Button>
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 scroll-smooth">
+          {filteredMedia.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-zinc-500 dark:text-zinc-400 space-y-4">
+              <svg className="w-12 h-12 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <p>No media files found matching "{searchQuery}"</p>
             </div>
-          </div>
-        )}
-
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="images">Images</TabsTrigger>
-            <TabsTrigger value="videos">Videos</TabsTrigger>
-            <TabsTrigger value="audio">Audio</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="all" className="mt-0">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {MOCK_MEDIA.map(media => (
-                <div 
-                  key={media.id} 
-                  className={`relative group rounded-xl border p-3 cursor-pointer transition-all ${
-                    selectedIds.has(media.id) 
-                      ? 'bg-violet-500/10 border-violet-500 shadow-[0_0_0_1px_rgba(139,92,246,1)]' 
-                      : 'glass border-zinc-800/60 hover:border-zinc-700'
-                  }`}
-                  onClick={() => toggleSelect(media.id)}
-                >
-                  <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className={`w-5 h-5 rounded border flex items-center justify-center ${selectedIds.has(media.id) ? 'bg-violet-500 border-violet-500 opacity-100' : 'border-zinc-500 bg-black/50'}`}>
-                      {selectedIds.has(media.id) && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
-                    </div>
-                  </div>
-                  
-                  <div className={`h-24 rounded-lg mb-3 flex items-center justify-center ${media.thumbnail}`}>
-                    {getIconForType(media.type)}
-                  </div>
-                  
-                  <h4 className="text-sm font-medium text-zinc-200 truncate" title={media.name}>{media.name}</h4>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-xs text-zinc-500 uppercase">{media.type}</span>
-                    <span className="text-xs text-zinc-500">{media.size}</span>
-                  </div>
-                </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6 pb-24">
+              {filteredMedia.map(media => (
+                <MediaCard 
+                  key={media.id}
+                  media={media}
+                  isSelected={selectedMediaIds.includes(media.id)}
+                  onSelect={() => toggleSelect(media.id)}
+                  onPreview={() => setPreviewMediaId(media.id)}
+                />
               ))}
             </div>
-          </TabsContent>
-          {/* Other tab contents would be filtered similarly */}
-        </Tabs>
-      </div>
+          )}
+        </div>
+
+        <AnimatePresence>
+          {selectedMediaIds.length > 0 && (
+            <SelectionToolbar 
+              selectedCount={selectedMediaIds.length}
+              onClear={clearSelection}
+              onDelete={() => {
+                // handle delete
+                clearSelection();
+              }}
+              onMove={() => {
+                // handle move
+              }}
+            />
+          )}
+        </AnimatePresence>
+      </main>
+
+      <UploadQueuePanel />
+      
+      {previewMedia && (
+        <MediaPreviewModal 
+          media={previewMedia}
+          onClose={() => setPreviewMediaId(null)}
+        />
+      )}
     </div>
   );
-}
-
-// Inline Plus icon since it wasn't imported from lucide-react at the top to save space
-function Plus(props: any) {
-  return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M5 12h14"/><path d="M12 5v14"/></svg>;
 }

@@ -24,31 +24,31 @@
 | Phase UI-2 — Marketing Pages| ✅ Complete | 10 | Route Group, About, Features, Blog, Legal |
 | Phase UI-3 — Auth Experience | ✅ Complete | 18 | Glass Cards, Floating Labels, Workspace Wizard |
 | Phase UI-4 — Dashboard Experience| ✅ Complete | 9 | Command Palette, Sidebar, Analytics Charts |
-| **Phase UI-5 — Workspace Experience**| **✅ Complete**| **6** | **Grid/List Morphing, Project Cards, Dialogs** |
+| Phase UI-5 — Workspace Experience| ✅ Complete | 6 | Grid/List Morphing, Project Cards, Dialogs |
+| **Phase UI-6 — Media Library Experience**| **✅ Complete**| **8** | **Frame.io style 3-pane layout, drag-and-drop, modals** |
 | Phase 9.3 — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 298 files
+## Current File Count: 305 files
 
-## Phase UI-5 Deliverables (Projects Workspace)
+## Phase UI-6 Deliverables (Media Library)
 
 ### Interactive Layout
 | File | Purpose |
 |------|---------|
-| `(dashboard)/projects/page.tsx` | The central Workspace view. Establishes a stateful layout utilizing `framer-motion` `<AnimatePresence>` to flawlessly morph between Grid and List views when toggled, achieving a premium Apple/Figma level of polish. |
-| `project-toolbar.tsx` | A sticky, glassmorphic control bar featuring the View Switcher, an Instant Search input, and filter dropdowns (Resolution, Status, AI). |
+| `(dashboard)/media/page.tsx` | Replaces the placeholder page with a responsive 3-pane flex layout. It maps an array of 12 highly detailed mock media items to the grid, handles bulk selection state, and orchestrates a smooth drag-and-drop overlay using native HTML5 events combined with `framer-motion`. |
+| `folder-sidebar.tsx` | A resizable-style left sidebar featuring animated nested folders (My Media, Favorites, Recent, Shared) and a dynamic storage progress indicator. |
+| `media-toolbar.tsx` | A sticky, glassmorphic top bar containing breadcrumbs, an instant search input, and filter mock buttons for File Type, Size, and Date. |
 
-### Specialized Components
+### Specialized Media Components
 | File | Purpose |
 |------|---------|
-| `project-card.tsx` | Used exclusively in Grid view. Features a large 16:9 thumbnail wrapper triggered by a `HoverToolbar`. Overlays critical badges (Duration, FPS, Resolution, glowing AI Badge) and a footer mapping overlapping Team Avatars. |
-| `project-list-item.tsx` | The condensed counterpart to the card, optimized for rapid vertical scanning in List/Table views while retaining identical interaction handlers and animations. |
+| `media-card.tsx` | A premium, multi-purpose card supporting Videos, Images, and Audio. Features robust hover animations (simulating a video scrub), dynamic metadata badges (resolution, fps, size, codec), cloud sync status indicators, and a selection checkbox. |
+| `selection-toolbar.tsx` | A floating action bar that slides up into view via `AnimatePresence` when `selectedMediaIds.length > 0`, offering rapid bulk actions (Move, Delete, Favorite, Download). |
 
-### Menus & Modals
+### Modals & Panels
 | File | Purpose |
 |------|---------|
-| `create-project-dialog.tsx` | A premium, multi-step modal (`Dialog` primitive) managing complex project initialization state. Smoothly transitions between core Settings (Name, Aspect Ratio, Res) and a visually rich Template Gallery. |
-| `context-menu.tsx` | A custom right-click context menu wrapper. Prevents the default browser action to inject a fluid glassmorphic menu offering rapid commands (Duplicate, Rename, Archive, Move, Pin). |
-
-### Architecture Highlights
-- **Framer Motion Layout Sync:** We aggressively utilized `layoutId` sharing between the `project-card.tsx` and `project-list-item.tsx`. When a user toggles the view mode, Next.js doesn't just re-render; it smoothly interpolates the exact bounding boxes of the cards into their new list-row dimensions, completely avoiding jarring layout shifts.
+| `upload-queue-panel.tsx` | A floating glassmorphic panel pinned to the bottom-right. It simulates an active upload queue visually using progress bars, complete with mock Pause/Resume functionality. |
+| `media-preview-modal.tsx` | A large, cinematic preview environment. It splits the view between a media player/viewer on the left and a detailed `MetadataInspector` on the right (exposing Codecs, Dimensions, and EXIF mock data). |
+| `upload-zone.tsx` | Dedicated component abstracting the drag-and-drop mechanics to ensure clean separation of concerns away from the main page logic. |
