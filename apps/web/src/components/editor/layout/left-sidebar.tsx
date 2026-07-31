@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Image, Type, Music, MoveRight, Wand2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AssetsWorkspace } from "../assets/assets-workspace";
 
 const TABS = [
   { id: "media", icon: Image, label: "Media" },
@@ -44,13 +45,13 @@ export function LeftSidebar() {
       </div>
 
       {/* Secondary Content Column */}
-      <div className="w-72 bg-zinc-900/50 flex flex-col">
+      <div className="w-80 bg-zinc-900/50 flex flex-col">
         <div className="h-12 border-b border-zinc-800/50 flex items-center px-4">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-100">
             {TABS.find((t) => t.id === activeTab)?.label}
           </h2>
         </div>
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
@@ -58,9 +59,9 @@ export function LeftSidebar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
               transition={{ duration: 0.15 }}
-              className="text-sm text-zinc-500"
+              className="w-full h-full"
             >
-              Placeholder content for {activeTab} panel.
+              <AssetsWorkspace activeTab={activeTab} />
             </motion.div>
           </AnimatePresence>
         </div>
