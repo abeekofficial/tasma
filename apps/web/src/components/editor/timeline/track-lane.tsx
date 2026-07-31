@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 
 interface TrackLaneProps {
   height?: number;
@@ -8,6 +9,7 @@ interface TrackLaneProps {
   durationInSeconds?: number;
   fps?: number;
   children?: React.ReactNode;
+  isLocked?: boolean;
 }
 
 export function TrackLane({
@@ -16,21 +18,34 @@ export function TrackLane({
   durationInSeconds = 60,
   fps = 30,
   children,
+  isLocked = false,
 }: TrackLaneProps) {
   const pixelsPerSecond = zoomScale * fps;
   const totalWidth = durationInSeconds * pixelsPerSecond;
   
-  const backgroundImage = `linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px)`;
+  const backgroundImage = `linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px)`;
   const backgroundSize = `${pixelsPerSecond}px 100%`;
 
   return (
-    <div 
-      className="relative border-b border-neutral-800 bg-neutral-900/50"
-      style={{ height: `${height}px`, width: `${totalWidth}px`, backgroundImage, backgroundSize }}
+    <motion.div 
+      className={`relative border-b border-[#1e1e1e] bg-[#0a0a0a] overflow-hidden ${
+        isLocked 
+          ? "opacity-75 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgba(255,255,255,0.02)_10px,rgba(255,255,255,0.02)_20px)]" 
+          : ""
+      }`}
+      style={{ height, minWidth: totalWidth, backgroundImage, backgroundSize }}
+      layout
     >
+      <div 
+        className="absolute inset-0 pointer-events-none" 
+        style={{ 
+          backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0.01) 1px, transparent 1px)`, 
+          backgroundSize: `${pixelsPerSecond / 10}px 100%` 
+        }} 
+      />
       <div className="absolute inset-0">
         {children}
       </div>
-    </div>
+    </motion.div>
   );
 }

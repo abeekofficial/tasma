@@ -27,27 +27,27 @@
 | Phase UI-5 — Workspace Experience| ✅ Complete | 6 | Grid/List Morphing, Project Cards, Dialogs |
 | Phase UI-6 — Media Library Experience| ✅ Complete | 8 | Frame.io style 3-pane layout, drag-and-drop, modals |
 | Phase UI-7A — Editor Shell UI| ✅ Complete | 5 | Resizable Panels, Dual-pane Sidebar, Inspector |
-| **Phase UI-7B — Timeline Engine UI**| **✅ Complete**| **13**| **60FPS DOM optimized, track headers, playhead, clip handles** |
+| Phase UI-7B — Timeline Engine UI| ✅ Complete | 13| 60FPS DOM optimized, track headers, playhead, clip handles |
+| **Phase UI-7B.1 — Timeline Canvas Foundation**| **✅ Complete**| **4**| **DOM Scroll Sync, Zoom-aware Grid, Native Track Headers** |
 | Phase 9.3 — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 323 files
+## Current File Count: 327 files
 
-## Phase UI-7B Deliverables (Professional Timeline Engine UI)
+## Phase UI-7B.1 Deliverables (Timeline Canvas Foundation)
 
-### Core Timeline Workspace
+### High-Performance DOM Synchronization
 | File | Purpose |
 |------|---------|
-| `bottom-timeline.tsx` | Updated to mount the new workspace elements instead of the static placeholder block. |
-| `timeline-workspace.tsx` | The master layout container splitting the left-side `TrackHeaders` and the right-side `TimelineCanvas`. |
-| `playback-controls.tsx` | Dense, metallic-styled playback controls (Play, Pause, Step frame) utilizing `framer-motion` tap feedback. |
-| `timeline-minimap.tsx` | A VSCode-style structural minimap offering rapid visual representation of multiple tracks and providing horizontal navigation capability. |
+| `timeline-workspace.tsx` | Completely overhauled to bypass React rendering cycles for scroll events. Uses `useRef` and native `onScroll` handlers to perfectly synchronize the horizontal scrolling of the `TimelineCanvas` with the `TimeRuler`, and the vertical scrolling with the `TrackContainer`. |
+| `track-container.tsx` | Dedicated layout wrapper for the left side of the timeline, mapping a rich array of `MOCK_TRACKS` to render highly detailed headers. |
+| `status-bar.tsx` | Bottom anchor component displaying a pulsing "Ready" status and housing the zoom controls. |
 
-### Track & Canvas Components
+### Zoom & Grid Mechanics
 | File | Purpose |
 |------|---------|
-| `time-ruler.tsx` & `playhead.tsx` | Accurately renders timeline ticks matching the track background grids. The Playhead features a dragged state bounded to the canvas dimensions. |
-| `track-header.tsx` | The left-side control panel mimicking Premiere Pro. Includes editable track names and full toggle controls with dynamic color indications (Mute, Solo, Hide, Lock). |
-| `track-lane.tsx` | A scalable horizontal container featuring repeating linear CSS gradients for background grid alignment to the ruler. |
-| `clip-block.tsx` & `clip.tsx` | The core media element representation. Employs `framer-motion` for drag events and visual magnetic snap states, alongside conditionally rendered left/right trim handles based on interaction context. |
-| `marker-layer.tsx` | Displays absolute-positioned dashed markers stretching vertically across the timeline, used for visual chapter mapping. |
+| `zoom-controls.tsx` | Dedicated control module featuring a native-feeling input range slider, zoom in/out icons with `lucide-react`, a "Fit Timeline" button, and a real-time zoom percentage label. |
+| `grid-layer.tsx` | An absolute-positioned SVG layer stretching across the canvas. Uses highly performant SVG patterns to draw precision frame and second subdivisions perfectly aligned with the ruler ticks based on the active `zoomScale`. |
+| `time-ruler.tsx` | Refactored to dynamically render tick subdivisions (minutes, seconds, frames) intelligently based on the zoom depth, rather than a static visual. |
+| `track-header.tsx` | Updated to the strict DaVinci Resolve aesthetic: features dynamic height resizing using standard mouse events, a colored left track indicator strip, and dense native UI toggles. |
+| `track-lane.tsx` | Refactored to synchronize its height directly with its corresponding `TrackHeader` using Framer Motion's `layout` properties, maintaining the grid background alignment. |
