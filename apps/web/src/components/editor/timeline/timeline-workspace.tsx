@@ -4,6 +4,8 @@ import React, { useRef } from "react";
 import { motion } from "framer-motion";
 import { TrackContainer } from "./track-container";
 import { StatusBar } from "./status-bar";
+import { TimelineRuler } from "./timeline-ruler";
+import { TimelinePlayhead } from "./timeline-playhead";
 
 export const TimelineWorkspace = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -62,13 +64,8 @@ export const TimelineWorkspace = () => {
             className="h-7 border-b border-zinc-800/60 bg-zinc-900/95 backdrop-blur-md overflow-x-auto shrink-0 sticky-top z-10 [&::-webkit-scrollbar]:hidden"
             style={{ scrollbarWidth: 'none' }}
           >
-            <div className="w-[200%] flex items-end h-full">
-              {/* Ticks */}
-              {Array.from({ length: 40 }).map((_, i) => (
-                <div key={i} className="w-[50px] border-l border-zinc-700/50 h-2/3 flex items-start text-[9px] text-zinc-500 pl-1 font-mono">
-                  00:00:{i.toString().padStart(2, '0')}
-                </div>
-              ))}
+            <div className="w-[200%] h-full">
+              <TimelineRuler />
             </div>
           </div>
           
@@ -80,13 +77,7 @@ export const TimelineWorkspace = () => {
           >
             <div className="w-[200%] flex flex-col relative min-h-max pb-20">
               {/* Playhead */}
-              <motion.div 
-                initial={{ x: 150 }}
-                className="absolute top-0 bottom-0 w-[1px] bg-red-500 z-20 pointer-events-none shadow-[0_0_8px_rgba(239,68,68,0.6)]"
-              >
-                <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-red-500 absolute -top-0 -left-[5.5px]" />
-                <div className="w-4 h-4 bg-red-500/20 absolute -top-0 -left-[7.5px] rounded-full blur-[2px]" />
-              </motion.div>
+              <TimelinePlayhead />
 
               {/* 6 Track Lanes to match MOCK_TRACKS */}
               {Array.from({ length: 6 }).map((_, idx) => (

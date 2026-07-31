@@ -3,7 +3,9 @@
 import React, { useState } from "react";
 import { ZoomIn, ZoomOut } from "lucide-react";
 import { TimelineWorkspace } from "../timeline/timeline-workspace";
-import { PlaybackControls } from "../timeline/playback-controls";
+import { PlayControls } from "../timeline/play-controls";
+import { TimecodeDisplay } from "../timeline/timecode-display";
+import { FrameCounter } from "../timeline/frame-counter";
 import { TimelineMinimap } from "../timeline/timeline-minimap";
 
 export const BottomTimeline = () => {
@@ -15,15 +17,14 @@ export const BottomTimeline = () => {
       <div className="h-12 border-b border-zinc-900 flex items-center justify-between px-4 bg-zinc-950 shadow-[0_4px_20px_rgba(0,0,0,0.5)] z-30">
         
         {/* Playback Controls Component */}
-        <div className="w-1/3 flex items-center">
-          <PlaybackControls />
+        <div className="w-1/3 flex items-center gap-4">
+          <PlayControls />
+          <FrameCounter />
         </div>
 
         {/* Timecode & Minimap */}
         <div className="w-1/3 flex flex-col items-center justify-center gap-1">
-          <div className="font-mono text-indigo-400 text-lg tracking-widest font-bold bg-black/50 px-4 py-0.5 rounded border border-zinc-800 shadow-inner shadow-black/80">
-            00:00:12:15
-          </div>
+          <TimecodeDisplay />
         </div>
 
         {/* Zoom Controls & Minimap */}

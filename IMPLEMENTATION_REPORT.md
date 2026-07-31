@@ -17,7 +17,7 @@
 | Phase 9.1A — FFmpeg Core | ✅ Complete | 10 | `@tasma/ffmpeg-core` Workspace Library |
 | Phase 9.1B — Media Analysis | ✅ Complete | 8 | Video/Audio/Image/Quality Analyzers & Generators |
 | Phase 9.1C — Video Processing | ✅ Complete | 7 | Pipeline Builder, Complex Filter Graphs, Operations |
-| Phase 9.1D — Audio Processing | ✅ Complete | 4 | EQ, Comp, Voice Enhancements, A/V Sync |
+| Phase 9.1D — Audio Processing | ✅ Complete | 4 | EQ, Comp, Voice enhancements, A/V Sync |
 | Phase 9.1E — Performance Engine | ✅ Complete | 4 | GPU Detection, Codec Routing, Benchmarks, Caching |
 | Phase 9.2 — Subtitle Engine | ✅ Complete | 5 | SRT/VTT Parsers, ASS Serializer, Subtitle Ops |
 | Phase UI-1 — Marketing Landing Page| ✅ Complete | 13 | Glassmorphism, Framer Motion, Vercel Aesthetic |
@@ -28,26 +28,25 @@
 | Phase UI-6 — Media Library Experience| ✅ Complete | 8 | Frame.io style 3-pane layout, drag-and-drop, modals |
 | Phase UI-7A — Editor Shell UI| ✅ Complete | 5 | Resizable Panels, Dual-pane Sidebar, Inspector |
 | Phase UI-7B — Timeline Engine UI| ✅ Complete | 13| 60FPS DOM optimized, track headers, playhead, clip handles |
-| **Phase UI-7B.1 — Timeline Canvas Foundation**| **✅ Complete**| **4**| **DOM Scroll Sync, Zoom-aware Grid, Native Track Headers** |
+| Phase UI-7B.1 — Timeline Canvas| ✅ Complete | 4 | DOM Scroll Sync, Zoom-aware Grid, Native Track Headers |
+| **Phase UI-7B.2 — Playhead & Ruler**| **✅ Complete**| **3** | **60FPS Scrubbing, Memoized Ticks, Metallic Playback Deck** |
 | Phase 9.3 — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 327 files
+## Current File Count: 330 files
 
-## Phase UI-7B.1 Deliverables (Timeline Canvas Foundation)
+## Phase UI-7B.2 Deliverables (Professional Playhead & Time Ruler)
 
-### High-Performance DOM Synchronization
+### Precision Scrubbing Mechanics
 | File | Purpose |
 |------|---------|
-| `timeline-workspace.tsx` | Completely overhauled to bypass React rendering cycles for scroll events. Uses `useRef` and native `onScroll` handlers to perfectly synchronize the horizontal scrolling of the `TimelineCanvas` with the `TimeRuler`, and the vertical scrolling with the `TrackContainer`. |
-| `track-container.tsx` | Dedicated layout wrapper for the left side of the timeline, mapping a rich array of `MOCK_TRACKS` to render highly detailed headers. |
-| `status-bar.tsx` | Bottom anchor component displaying a pulsing "Ready" status and housing the zoom controls. |
+| `timeline-playhead.tsx` | Replaces the basic playhead. Features a distinctive red polygonal SVG top handle and a 1px vertical line spanning `100vh`. Utilizes Framer Motion's `motion.div drag="x"` to ensure 60FPS horizontal dragging that completely bypasses the React render cycle, preventing timeline layout thrashing. |
+| `timeline-ruler.tsx` | The interactive tracking surface spanning the top of the timeline canvas. Implements DOM-level `onPointerDown` and `onPointerMove` event tracking for precise "Click to Seek" functionality across the entire track surface. |
+| `time-marks.tsx` | A highly-optimized, heavily memoized drawing component. It maps the current `zoomScale` and `totalWidth` to precisely draw SVG ticks (frames, minor ticks, major seconds), ignoring rapid playhead updates to maintain peak rendering performance. |
 
-### Zoom & Grid Mechanics
+### Playback & Status Controls
 | File | Purpose |
 |------|---------|
-| `zoom-controls.tsx` | Dedicated control module featuring a native-feeling input range slider, zoom in/out icons with `lucide-react`, a "Fit Timeline" button, and a real-time zoom percentage label. |
-| `grid-layer.tsx` | An absolute-positioned SVG layer stretching across the canvas. Uses highly performant SVG patterns to draw precision frame and second subdivisions perfectly aligned with the ruler ticks based on the active `zoomScale`. |
-| `time-ruler.tsx` | Refactored to dynamically render tick subdivisions (minutes, seconds, frames) intelligently based on the zoom depth, rather than a static visual. |
-| `track-header.tsx` | Updated to the strict DaVinci Resolve aesthetic: features dynamic height resizing using standard mouse events, a colored left track indicator strip, and dense native UI toggles. |
-| `track-lane.tsx` | Refactored to synchronize its height directly with its corresponding `TrackHeader` using Framer Motion's `layout` properties, maintaining the grid background alignment. |
+| `play-controls.tsx` | Replaces the placeholder component with a dense, metallic-styled playback deck mimicking DaVinci Resolve. Features robust controls: Jump Start, Previous Frame, Play, Pause, Stop, Next Frame, Jump End, and Loop Toggle. |
+| `timecode-display.tsx` | An isolated UI component enforcing monospaced typography specifically for displaying SMPTE timecode (e.g., `00:00:12:15`). |
+| `frame-counter.tsx` | An isolated UI component enforcing monospaced typography for displaying the absolute frame count. |
