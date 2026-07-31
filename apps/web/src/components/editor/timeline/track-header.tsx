@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { Lock, Unlock, Eye, EyeOff, Film, Type, Volume2, Settings2 } from "lucide-react";
+import { Lock, Unlock, Eye, EyeOff, Film, Type, Volume2, Settings2, GripVertical, ChevronDown, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 export type TrackType = "video" | "audio" | "subtitle";
@@ -34,11 +34,14 @@ export function TrackHeader({
   onUpdate,
 }: TrackHeaderProps) {
   const [localHeight, setLocalHeight] = useState(height);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const minHeight = 48;
   const maxHeight = 300;
 
   const startResize = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
+    if (isCollapsed) return;
+    
     const startY = e.clientY;
     const startHeight = localHeight;
 
@@ -56,30 +59,43 @@ export function TrackHeader({
 
     document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("mouseup", onMouseUp);
-  }, [localHeight, id, onHeightChange]);
+  }, [localHeight, id, onHeightChange, isCollapsed]);
 
   const toggleMute = () => onUpdate?.(id, { isMuted: !isMuted });
   const toggleSolo = () => onUpdate?.(id, { isSolo: !isSolo });
   const toggleLock = () => onUpdate?.(id, { isLocked: !isLocked });
   const toggleHidden = () => onUpdate?.(id, { isHidden: !isHidden });
+  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
   
   const TrackIcon = type === "video" ? Film : type === "audio" ? Volume2 : Type;
+  const currentHeight = isCollapsed ? 36 : localHeight;
 
   return (
     <motion.div 
-      className="relative flex w-64 flex-none select-none flex-col border-b border-r border-[#1e1e1e] bg-[#141414] text-neutral-300"
-      style={{ height: localHeight }}
+      className="relative flex w-64 flex-none select-none flex-col border-b border-r border-[#1e1e1e] bg-[#141414] text-neutral-300 transition-colors hover:bg-[#1a1a1a]"
+      style={{ height: currentHeight }}
       layout
     >
       {/* Left Color Strip */}
       <div 
-        className="absolute left-0 top-0 bottom-0 w-1.5 opacity-80" 
+        className="absolute left-0 top-0 bottom-0 w-1 opacity-80" 
         style={{ backgroundColor: color }} 
       />
+      
+      {/* Drag Handle */}
+      <div className="absolute left-1 top-0 bottom-0 w-4 flex items-center justify-center cursor-grab active:cursor-grabbing text-neutral-600 hover:text-neutral-400 hover:bg-white/5 transition-colors">
+        <GripVertical size={12} />
+      </div>
 
-      <div className="flex flex-1 flex-col justify-between p-2 pl-3">
+      <div className="flex flex-1 flex-col justify-between py-2 pr-2 pl-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 overflow-hidden">
+          <div className="flex items-center space-x-1.5 overflow-hidden">
+            <button 
+              onClick={toggleCollapse}
+              className="p-0.5 rounded hover:bg-white/10 text-neutral-400 transition-colors"
+            >
+              {isCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
+            </button>
             <TrackIcon size={14} className="text-neutral-400 flex-none" />
             <input
               type="text"
@@ -110,7 +126,7 @@ export function TrackHeader({
           </div>
         </div>
 
-        {localHeight >= 72 && (
+        {!isCollapsed && localHeight >= 72 && (
           <div className="flex items-center space-x-1 mt-auto">
             {type === "audio" && (
               <>
@@ -144,10 +160,12 @@ export function TrackHeader({
       </div>
 
       {/* Resize Handle */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 h-1.5 cursor-row-resize hover:bg-white/10 z-10 transition-colors"
-        onMouseDown={startResize}
-      />
+      {!isCollapsed && (
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-1.5 cursor-row-resize hover:bg-white/10 z-10 transition-colors"
+          onMouseDown={startResize}
+        />
+      )}
     </motion.div>
   );
 }

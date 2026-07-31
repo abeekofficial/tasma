@@ -27,26 +27,30 @@
 | Phase UI-5 — Workspace Experience| ✅ Complete | 6 | Grid/List Morphing, Project Cards, Dialogs |
 | Phase UI-6 — Media Library Experience| ✅ Complete | 8 | Frame.io style 3-pane layout, drag-and-drop, modals |
 | Phase UI-7A — Editor Shell UI| ✅ Complete | 5 | Resizable Panels, Dual-pane Sidebar, Inspector |
-| Phase UI-7B — Timeline Engine UI| ✅ Complete | 13| 60FPS DOM optimized, track headers, playhead, clip handles |
 | Phase UI-7B.1 — Timeline Canvas| ✅ Complete | 4 | DOM Scroll Sync, Zoom-aware Grid, Native Track Headers |
-| **Phase UI-7B.2 — Playhead & Ruler**| **✅ Complete**| **3** | **60FPS Scrubbing, Memoized Ticks, Metallic Playback Deck** |
+| Phase UI-7B.2 — Playhead & Ruler| ✅ Complete | 3 | 60FPS Scrubbing, Memoized Ticks, Metallic Playback Deck |
+| **Phase UI-7B — Advanced Timeline Ops**| **✅ Complete**| **2**| **Multi-Selection UI, Right-Click Menus, Snap Previews** |
 | Phase 9.3 — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 330 files
+## Current File Count: 332 files
 
-## Phase UI-7B.2 Deliverables (Professional Playhead & Time Ruler)
+## Phase UI-7B Deliverables (Advanced Clip Interactions & Menus)
 
-### Precision Scrubbing Mechanics
+### Track Enhancements
 | File | Purpose |
 |------|---------|
-| `timeline-playhead.tsx` | Replaces the basic playhead. Features a distinctive red polygonal SVG top handle and a 1px vertical line spanning `100vh`. Utilizes Framer Motion's `motion.div drag="x"` to ensure 60FPS horizontal dragging that completely bypasses the React render cycle, preventing timeline layout thrashing. |
-| `timeline-ruler.tsx` | The interactive tracking surface spanning the top of the timeline canvas. Implements DOM-level `onPointerDown` and `onPointerMove` event tracking for precise "Click to Seek" functionality across the entire track surface. |
-| `time-marks.tsx` | A highly-optimized, heavily memoized drawing component. It maps the current `zoomScale` and `totalWidth` to precisely draw SVG ticks (frames, minor ticks, major seconds), ignoring rapid playhead updates to maintain peak rendering performance. |
+| `track-header.tsx` | Enhanced with visual drag handles (`grip-vertical` icon) on the far left to allow visual track reordering, alongside a chevron collapse toggle to minimize track height dynamically. |
+| `track-container.tsx` | Wired to `framer-motion`'s `<Reorder.Group>` and `<Reorder.Item>` enabling seamless layout animations when dragging tracks vertically to reorder them in the stack. |
 
-### Playback & Status Controls
+### Clip Mechanics & Snap UI
 | File | Purpose |
 |------|---------|
-| `play-controls.tsx` | Replaces the placeholder component with a dense, metallic-styled playback deck mimicking DaVinci Resolve. Features robust controls: Jump Start, Previous Frame, Play, Pause, Stop, Next Frame, Jump End, and Loop Toggle. |
-| `timecode-display.tsx` | An isolated UI component enforcing monospaced typography specifically for displaying SMPTE timecode (e.g., `00:00:12:15`). |
-| `frame-counter.tsx` | An isolated UI component enforcing monospaced typography for displaying the absolute frame count. |
+| `clip-block.tsx` | Enhanced to display a Premiere/Resolve style glowing ring on selection. Replaced empty inner containers with conditional dark UI thumbnail placeholders (waveform stripes vs linear gradients based on clip type). Also implements UI Snap Guides triggering vertical blue bounding lines during active drag states. |
+
+### Canvas Selections & Context Menus
+| File | Purpose |
+|------|---------|
+| `timeline-context-menu.tsx` | A native-feeling glassmorphic floating menu intercepting `onContextMenu`. It features standard editing shortcuts (Duplicate, Split, Delete, Group, Lock) positioned dynamically under the cursor, complete with `lucide-react` icons. |
+| `selection-box.tsx` | A translucent blue overlay layer simulating coordinate-based rectangular multi-selection tracking over the canvas grid. |
+| `timeline-canvas.tsx` | Upgraded to mount the Context Menu globally across the editing surface, alongside binding native `onPointerDown`/`Move`/`Up` tracking algorithms to drive the visual Selection Box geometry during drags. |
