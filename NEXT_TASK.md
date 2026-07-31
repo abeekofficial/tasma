@@ -3,8 +3,8 @@
 **Phase 9.3 — Backend CRUD Modules**
 
 ### Resume Point
-Phase UI-7C (Professional Preview Player) is fully complete (5 new components, 1 modified, 337 total files).
-The `apps/web` package now features a fully interactive Preview Canvas with `framer-motion` pan/zoom mechanics, Title Safe grids, Mock Transform Overlays, and a dedicated status bar to reflect playback resolution and dropped frame metrics.
+Phase UI-7D (Professional Inspector Panel) is fully complete (13 new components, 1 modified layout, 350 total files).
+The `apps/web` package now features a fully interactive Inspector panel on the right side of the editor, boasting granular `framer-motion` accordion sections (Transform, Color, Text, Audio, Animation, Metadata) populated with premium custom controls (sliders, drag-to-scrub inputs, dropdowns) matching the DaVinci Resolve aesthetic.
 
 ### Phase 9.3 — Backend CRUD Modules
 - `apps/api/src/modules/projects/projects.service.ts`
@@ -26,7 +26,7 @@ The `apps/web` package now features a fully interactive Preview Canvas with `fra
 - `apps/api/src/modules/timeline/timeline.validators.ts`
 
 ### Last Completed File
-`apps/web/src/components/editor/preview/overlay-layer.tsx`
+`apps/web/src/components/editor/layout/right-inspector.tsx`
 
 ### Do Not Regenerate
-Everything in phases 1-9.2, UI-1 through UI-7C (337 files already complete).
+Everything in phases 1-9.2, UI-1 through UI-7D (350 files already complete).
