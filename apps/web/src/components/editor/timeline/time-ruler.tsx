@@ -1,75 +1,72 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useEditor } from '@/hooks/use-editor-state';
+import React, { useState, useRef } from "react";
+import { motion } from "framer-motion";
 
 interface TimeRulerProps {
-  zoom: number;
-  duration: number;
-  currentTime: number;
+  zoomScale?: number;
+  durationInSeconds?: number;
+  fps?: number;
 }
 
-export const TimeRuler = React.memo(({ zoom, duration, currentTime }: TimeRulerProps) => {
-  const { dispatch } = useEditor();
-  const pixelsPerSecond = 60 * zoom;
-  const width = duration * pixelsPerSecond;
+export function TimeRuler({
+  zoomScale = 5,
+  durationInSeconds = 60,
+  fps = 30,
+}: TimeRulerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [playheadPos, setPlayheadPos] = useState(0);
 
-  const handleRulerClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const time = Math.max(0, Math.min(duration, x / pixelsPerSecond));
-    dispatch({ type: 'SET_CURRENT_TIME', payload: { currentTime: time } });
-  };
+  const pixelsPerSecond = zoomScale * fps;
+  const totalWidth = durationInSeconds * pixelsPerSecond;
+  const tickSpacing = pixelsPerSecond;
 
-  const renderTicks = () => {
-    const ticks = [];
-    // Adjust tick frequency based on zoom
-    const majorInterval = zoom < 0.5 ? 10 : zoom > 3 ? 1 : 5;
-    const minorInterval = majorInterval / 5;
-    const numTicks = Math.ceil(duration / minorInterval);
-
-    for (let i = 0; i <= numTicks; i++) {
-      const time = i * minorInterval;
-      if (time > duration) break;
-      
-      const x = time * pixelsPerSecond;
-      const isMajor = time % majorInterval === 0;
-
-      ticks.push(
-        <div key={time} className="absolute top-0 flex flex-col items-center" style={{ left: `${x}px`, transform: 'translateX(-50%)' }}>
-          {isMajor ? (
-            <>
-              <div className="h-3 w-px bg-zinc-600" />
-              <span className="text-[10px] text-zinc-500 mt-0.5 font-mono select-none">
-                0:{time.toString().padStart(2, '0')}
-              </span>
-            </>
-          ) : (
-             <div className="h-1.5 w-px bg-zinc-700" />
-          )}
-        </div>
-      );
-    }
-    return ticks;
-  };
+  const ticks = Array.from({ length: durationInSeconds + 1 }).map((_, i) => i);
 
   return (
     <div 
-      className="h-6 sticky top-0 bg-zinc-900/50 backdrop-blur-sm z-10 border-b border-zinc-800 cursor-text overflow-hidden"
-      style={{ width: `${width}px`, minWidth: '100%' }}
-      onClick={handleRulerClick}
+      className="relative flex h-8 w-full select-none overflow-hidden border-b border-neutral-800 bg-neutral-900"
+      ref={containerRef}
     >
-      <div className="relative w-full h-full">
-        {renderTicks()}
-        {/* Small red marker at current time on ruler */}
-        <div 
-          className="absolute top-0 h-full w-px bg-red-500 pointer-events-none"
-          style={{ left: `${currentTime * pixelsPerSecond}px` }}
+      <div 
+        className="relative h-full flex-none" 
+        style={{ width: `${totalWidth}px` }}
+      >
+        {ticks.map((tick) => (
+          <div
+            key={tick}
+            className="absolute bottom-0 top-0 flex flex-col justify-end border-l border-neutral-700"
+            style={{ left: `${tick * tickSpacing}px`, width: `${tickSpacing}px` }}
+          >
+            <span className="mb-1 ml-1 font-mono text-[10px] text-neutral-400">
+              00:00:{(tick < 10 ? "0" : "") + tick}:00
+            </span>
+            <div className="flex h-1/3 w-full items-end justify-between">
+              {[1, 2, 3, 4].map((subTick) => (
+                <div key={subTick} className="h-1.5 w-px bg-neutral-700" />
+              ))}
+            </div>
+          </div>
+        ))}
+
+        <motion.div
+          className="absolute bottom-0 top-0 z-50 flex cursor-ew-resize flex-col items-center"
+          style={{ width: "13px", marginLeft: "-6.5px", left: playheadPos }}
+          drag="x"
+          dragConstraints={containerRef}
+          dragElastic={0}
+          dragMomentum={false}
+          onDrag={(e, info) => {
+            const newX = Math.max(0, Math.min(playheadPos + info.delta.x, totalWidth));
+            setPlayheadPos(newX);
+          }}
         >
-           <div className="absolute top-0 -translate-x-1/2 w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-red-500" />
-        </div>
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0H13V6.5L6.5 13L0 6.5V0Z" fill="#ef4444" />
+          </svg>
+          <div className="h-[2000px] w-px bg-red-500" />
+        </motion.div>
       </div>
     </div>
   );
-});
-TimeRuler.displayName = 'TimeRuler';
+}

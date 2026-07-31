@@ -26,27 +26,28 @@
 | Phase UI-4 — Dashboard Experience| ✅ Complete | 9 | Command Palette, Sidebar, Analytics Charts |
 | Phase UI-5 — Workspace Experience| ✅ Complete | 6 | Grid/List Morphing, Project Cards, Dialogs |
 | Phase UI-6 — Media Library Experience| ✅ Complete | 8 | Frame.io style 3-pane layout, drag-and-drop, modals |
-| **Phase UI-7A — Editor Shell UI**| **✅ Complete**| **5** | **Resizable Panels, Dual-pane Sidebar, Inspector** |
+| Phase UI-7A — Editor Shell UI| ✅ Complete | 5 | Resizable Panels, Dual-pane Sidebar, Inspector |
+| **Phase UI-7B — Timeline Engine UI**| **✅ Complete**| **13**| **60FPS DOM optimized, track headers, playhead, clip handles** |
 | Phase 9.3 — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 310 files
+## Current File Count: 323 files
 
-## Phase UI-7A Deliverables (Professional Video Editor Shell)
+## Phase UI-7B Deliverables (Professional Timeline Engine UI)
 
-### Editor Layout Architecture
+### Core Timeline Workspace
 | File | Purpose |
 |------|---------|
-| `editor/[projectId]/page.tsx` | Overhauled to use `react-resizable-panels`. It locks the viewport to `100vh` and injects a massive 5-pane layout structurally identical to DaVinci Resolve or Premiere Pro, featuring an outer vertical split and an inner horizontal split. |
+| `bottom-timeline.tsx` | Updated to mount the new workspace elements instead of the static placeholder block. |
+| `timeline-workspace.tsx` | The master layout container splitting the left-side `TrackHeaders` and the right-side `TimelineCanvas`. |
+| `playback-controls.tsx` | Dense, metallic-styled playback controls (Play, Pause, Step frame) utilizing `framer-motion` tap feedback. |
+| `timeline-minimap.tsx` | A VSCode-style structural minimap offering rapid visual representation of multiple tracks and providing horizontal navigation capability. |
 
-### Core Shell Components
+### Track & Canvas Components
 | File | Purpose |
 |------|---------|
-| `left-sidebar.tsx` | A dual-pane design with a narrow leftmost column containing icon tabs (Media, Text, Audio, Transitions) and a dynamic secondary panel that lazily loads placeholder content. |
-| `right-inspector.tsx` | A scrollable, dense properties panel utilizing accordion-style collapsible sections for Transform, Animation, Color, Audio, and Effects, complete with premium mock scrubbing inputs. |
-| `center-preview.tsx` | The main viewing canvas. Includes floating glassmorphic controls for Zoom manipulation, Safe Area boundaries, and a Grid overlay toggle. |
-| `top-toolbar.tsx` | A dense header housing the editable project name, autosave indicator, Undo/Redo logic placeholders, and an animated AI Studio launch button. |
-| `bottom-timeline.tsx` | The container reserving space for the future timeline engine. Implements a dedicated `PlaybackToolbar`, timecode display (`00:00:12:15`), and a timeline zoom slider. |
-
-### Architecture Highlights
-- **Native Application Feel:** By migrating away from standard CSS flexboxes to `react-resizable-panels`, the user can instantly drag the boundaries between the Sidebar, Preview, Inspector, and Timeline. The UI handles the resize events fluidly without thrashing, capturing the true "desktop application" feel required for a professional NLE (Non-Linear Editor) in the browser.
+| `time-ruler.tsx` & `playhead.tsx` | Accurately renders timeline ticks matching the track background grids. The Playhead features a dragged state bounded to the canvas dimensions. |
+| `track-header.tsx` | The left-side control panel mimicking Premiere Pro. Includes editable track names and full toggle controls with dynamic color indications (Mute, Solo, Hide, Lock). |
+| `track-lane.tsx` | A scalable horizontal container featuring repeating linear CSS gradients for background grid alignment to the ruler. |
+| `clip-block.tsx` & `clip.tsx` | The core media element representation. Employs `framer-motion` for drag events and visual magnetic snap states, alongside conditionally rendered left/right trim handles based on interaction context. |
+| `marker-layer.tsx` | Displays absolute-positioned dashed markers stretching vertically across the timeline, used for visual chapter mapping. |
