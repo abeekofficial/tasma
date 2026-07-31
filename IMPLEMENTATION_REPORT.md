@@ -29,28 +29,24 @@
 | Phase UI-7A — Editor Shell UI| ✅ Complete | 5 | Resizable Panels, Dual-pane Sidebar, Inspector |
 | Phase UI-7B.1 — Timeline Canvas| ✅ Complete | 4 | DOM Scroll Sync, Zoom-aware Grid, Native Track Headers |
 | Phase UI-7B.2 — Playhead & Ruler| ✅ Complete | 3 | 60FPS Scrubbing, Memoized Ticks, Metallic Playback Deck |
-| **Phase UI-7B — Advanced Timeline Ops**| **✅ Complete**| **2**| **Multi-Selection UI, Right-Click Menus, Snap Previews** |
+| Phase UI-7B — Advanced Timeline Ops| ✅ Complete | 2 | Multi-Selection UI, Right-Click Menus, Snap Previews |
+| **Phase UI-7C — Preview Player**| **✅ Complete**| **5** | **Framer Pan/Zoom, Safe Area Overlays, Grid Visualization** |
 | Phase 9.3 — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 332 files
+## Current File Count: 337 files
 
-## Phase UI-7B Deliverables (Advanced Clip Interactions & Menus)
+## Phase UI-7C Deliverables (Professional Preview Player)
 
-### Track Enhancements
+### Canvas & Overlays
 | File | Purpose |
 |------|---------|
-| `track-header.tsx` | Enhanced with visual drag handles (`grip-vertical` icon) on the far left to allow visual track reordering, alongside a chevron collapse toggle to minimize track height dynamically. |
-| `track-container.tsx` | Wired to `framer-motion`'s `<Reorder.Group>` and `<Reorder.Item>` enabling seamless layout animations when dragging tracks vertically to reorder them in the stack. |
+| `preview-canvas.tsx` | The interactive center stage. Features a dynamic checkerboard background via CSS patterns for transparency visualization. Uses `framer-motion` (`drag`, `dragControls`) for smooth pan interactions and accepts wheel events for smooth zooming. |
+| `overlay-layer.tsx` | An absolute-positioned UI layer resting above the video block. Responsibly renders Safe Margins (Title Safe, Action Safe, Rule of Thirds) and draws the mock Transform Bounding Box with resize handles and a rotation anchor imitating native desktop editors. |
 
-### Clip Mechanics & Snap UI
+### Navigation & Status Layout
 | File | Purpose |
 |------|---------|
-| `clip-block.tsx` | Enhanced to display a Premiere/Resolve style glowing ring on selection. Replaced empty inner containers with conditional dark UI thumbnail placeholders (waveform stripes vs linear gradients based on clip type). Also implements UI Snap Guides triggering vertical blue bounding lines during active drag states. |
-
-### Canvas Selections & Context Menus
-| File | Purpose |
-|------|---------|
-| `timeline-context-menu.tsx` | A native-feeling glassmorphic floating menu intercepting `onContextMenu`. It features standard editing shortcuts (Duplicate, Split, Delete, Group, Lock) positioned dynamically under the cursor, complete with `lucide-react` icons. |
-| `selection-box.tsx` | A translucent blue overlay layer simulating coordinate-based rectangular multi-selection tracking over the canvas grid. |
-| `timeline-canvas.tsx` | Upgraded to mount the Context Menu globally across the editing surface, alongside binding native `onPointerDown`/`Move`/`Up` tracking algorithms to drive the visual Selection Box geometry during drags. |
+| `preview-workspace.tsx` | The master container orchestrating the Flexbox layout of the Preview module, bridging the toolbar, the canvas, and the status bar. `center-preview.tsx` was successfully updated to mount this Workspace. |
+| `preview-toolbar.tsx` | The top control deck featuring native-feeling dropdown UI tools: View Options (Grid, Safe Area toggles), Zoom Presets (Fit, 25%, 50%, 100%), and a Render Quality Selector (Auto, Full, Half). |
+| `preview-status-bar.tsx` | The bottom metric deck. Displays critical composition parameters using monospaced fonts (Resolution, Aspect Ratio, FPS, Current Zoom %) and features a visual Dropped Frames Indicator light. |

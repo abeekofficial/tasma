@@ -3,8 +3,8 @@
 **Phase 9.3 — Backend CRUD Modules**
 
 ### Resume Point
-Phase UI-7B is now 100% complete (Canvas Foundation, Playhead & Ruler, Clip Interactions, Context Menus).
-The `apps/web` package features a fully comprehensive Professional Timeline Engine matching DaVinci Resolve standards with 60FPS UI scrubbing, multi-selection coordinate tracking, track reordering animations, and glassmorphic native context menus.
+Phase UI-7C (Professional Preview Player) is fully complete (5 new components, 1 modified, 337 total files).
+The `apps/web` package now features a fully interactive Preview Canvas with `framer-motion` pan/zoom mechanics, Title Safe grids, Mock Transform Overlays, and a dedicated status bar to reflect playback resolution and dropped frame metrics.
 
 ### Phase 9.3 — Backend CRUD Modules
 - `apps/api/src/modules/projects/projects.service.ts`
@@ -26,7 +26,7 @@ The `apps/web` package features a fully comprehensive Professional Timeline Engi
 - `apps/api/src/modules/timeline/timeline.validators.ts`
 
 ### Last Completed File
-`apps/web/src/components/editor/timeline/timeline-context-menu.tsx`
+`apps/web/src/components/editor/preview/overlay-layer.tsx`
 
 ### Do Not Regenerate
-Everything in phases 1-9.2, UI-1 through UI-7B (332 files already complete).
+Everything in phases 1-9.2, UI-1 through UI-7C (337 files already complete).
