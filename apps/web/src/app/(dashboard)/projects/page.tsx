@@ -1,150 +1,92 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Search, Plus, LayoutGrid, List, Filter } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { SkeletonCard } from '@/components/ui/skeleton';
-import { ProjectCard } from '@/components/projects/project-card';
-import { CreateProjectDialog } from '@/components/projects/create-project-dialog';
-import { useApi } from '@/hooks/use-api';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ProjectToolbar } from '@/components/workspace/project-toolbar';
+import { ProjectCard } from '@/components/workspace/project-card';
+import { ProjectListItem } from '@/components/workspace/project-list-item';
+import { CreateProjectDialog } from '@/components/workspace/create-project-dialog';
+import { ContextMenu } from '@/components/workspace/context-menu';
 
-interface Project {
+// Mock data
+export type Project = {
   id: string;
-  name: string;
-  platform: 'YOUTUBE_SHORTS' | 'TIKTOK' | 'INSTAGRAM_REELS' | 'FACEBOOK_REELS';
-  status: 'DRAFT' | 'PROCESSING' | 'READY' | 'PUBLISHED' | 'ERROR';
-  thumbnailUrl?: string;
-  duration?: number;
+  title: string;
+  duration: string;
+  fps: number;
+  resolution: string;
+  isAi: boolean;
+  isPinned: boolean;
+  teamAvatars: string[];
   updatedAt: string;
-}
+};
+
+const mockProjects: Project[] = [
+  { id: '1', title: 'Neon Cyberpunk Ad', duration: '00:15:30', fps: 60, resolution: '4K', isAi: true, isPinned: true, teamAvatars: ['/avatars/1.png', '/avatars/2.png'], updatedAt: '2 hours ago' },
+  { id: '2', title: 'Product Launch Teaser', duration: '00:01:45', fps: 30, resolution: '1080p', isAi: false, isPinned: true, teamAvatars: ['/avatars/3.png'], updatedAt: '5 hours ago' },
+  { id: '3', title: 'Docuseries Episode 4', duration: '00:45:00', fps: 24, resolution: '4K', isAi: true, isPinned: false, teamAvatars: ['/avatars/1.png', '/avatars/4.png', '/avatars/5.png'], updatedAt: '1 day ago' },
+  { id: '4', title: 'Social Media Shorts', duration: '00:00:15', fps: 60, resolution: '1080p Vertical', isAi: true, isPinned: false, teamAvatars: ['/avatars/2.png'], updatedAt: '2 days ago' },
+  { id: '5', title: 'Corporate Training Q3', duration: '01:20:00', fps: 30, resolution: '1080p', isAi: false, isPinned: false, teamAvatars: ['/avatars/6.png'], updatedAt: '3 days ago' },
+  { id: '6', title: 'Music Video - Starlight', duration: '00:03:45', fps: 24, resolution: '8K', isAi: true, isPinned: false, teamAvatars: ['/avatars/3.png', '/avatars/7.png'], updatedAt: '4 days ago' },
+  { id: '7', title: 'Indie Game Trailer', duration: '00:02:10', fps: 60, resolution: '4K', isAi: false, isPinned: false, teamAvatars: ['/avatars/1.png', '/avatars/8.png'], updatedAt: '1 week ago' },
+  { id: '8', title: 'Wedding Highlight Reel', duration: '00:05:30', fps: 24, resolution: '4K', isAi: true, isPinned: false, teamAvatars: ['/avatars/4.png', '/avatars/5.png'], updatedAt: '2 weeks ago' },
+];
 
 export default function ProjectsPage() {
-  const [search, setSearch] = useState('');
-  const [platformFilter, setPlatformFilter] = useState('ALL');
-  const [statusFilter, setStatusFilter] = useState('ALL');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const { data: projects, loading, error, request } = useApi<Project[]>();
-
-  useEffect(() => {
-    // Simulated API call for initial load
-    // In a real app, this would be request({ url: '/api/v1/projects' })
-    const loadProjects = async () => {
-      try {
-        await request({ url: '/api/v1/projects' });
-      } catch (err) {
-        // Handle error or use mock data for demo
-        console.error('Failed to load projects:', err);
-      }
-    };
-    loadProjects();
-  }, [request]);
-
-  // Mock data fallback for preview
-  const displayProjects = projects || [];
 
   return (
-    <div className="flex flex-col h-full space-y-6 animate-fade-in">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-zinc-100">Projects</h1>
-          <p className="text-sm text-zinc-400">Manage and create your video projects.</p>
-        </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)} className="w-full sm:w-auto">
-          <Plus className="w-4 h-4 mr-2" />
-          New Project
-        </Button>
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between p-4 glass rounded-xl border border-zinc-800/50">
-        <div className="flex-1 w-full relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-          <Input 
-            placeholder="Search projects..." 
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 w-full bg-zinc-900/50"
-          />
-        </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Select 
-            value={platformFilter} 
-            onChange={(e) => setPlatformFilter(e.target.value)}
-            className="w-full sm:w-36"
-            options={[
-              { value: 'ALL', label: 'All Platforms' },
-              { value: 'YOUTUBE_SHORTS', label: 'YouTube' },
-              { value: 'TIKTOK', label: 'TikTok' },
-              { value: 'INSTAGRAM_REELS', label: 'Instagram' }
-            ]}
-          />
-          <Select 
-            value={statusFilter} 
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full sm:w-36"
-            options={[
-              { value: 'ALL', label: 'All Status' },
-              { value: 'DRAFT', label: 'Draft' },
-              { value: 'READY', label: 'Ready' },
-              { value: 'PUBLISHED', label: 'Published' }
-            ]}
-          />
-          <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg p-1">
-            <button 
-              onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-zinc-800 text-zinc-100' : 'text-zinc-500 hover:text-zinc-300'}`}
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
-            <button 
-              onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-zinc-800 text-zinc-100' : 'text-zinc-500 hover:text-zinc-300'}`}
-            >
-              <List className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 min-h-0">
-        {loading ? (
-          <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
-            {[1, 2, 3, 4].map(i => (
-              <SkeletonCard key={i} className="h-64" />
-            ))}
-          </div>
-        ) : displayProjects.length > 0 ? (
-          <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
-            {displayProjects.map(project => (
-              <ProjectCard 
-                key={project.id} 
-                {...project} 
-                onClick={() => console.log('Navigate to project', project.id)}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="h-full flex flex-col items-center justify-center p-8 text-center border border-dashed border-zinc-800 rounded-2xl bg-zinc-900/20">
-            <div className="w-20 h-20 bg-violet-500/10 rounded-full flex items-center justify-center mb-4">
-              <Plus className="w-10 h-10 text-violet-500" />
+    <div className="flex-1 flex flex-col h-full bg-background/50 backdrop-blur-xl">
+      <div className="flex-1 overflow-y-auto p-6 lg:p-10 space-y-8">
+        <div className="flex flex-col gap-6 max-w-7xl mx-auto w-full">
+          {/* Header & Toolbar */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground">Projects</h1>
+              <p className="text-muted-foreground text-sm mt-1">Manage and collaborate on your video projects.</p>
             </div>
-            <h3 className="text-xl font-medium text-zinc-200 mb-2">No projects yet</h3>
-            <p className="text-zinc-400 mb-6 max-w-sm">
-              Create your first AI video project to get started. Choose from templates or start from scratch.
-            </p>
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
-              Create First Project
-            </Button>
+            <ProjectToolbar 
+              viewMode={viewMode} 
+              onViewModeChange={setViewMode} 
+              onCreateProject={() => setIsCreateDialogOpen(true)} 
+            />
           </div>
-        )}
-      </div>
 
-      <CreateProjectDialog 
-        isOpen={isCreateDialogOpen} 
-        onClose={() => setIsCreateDialogOpen(false)} 
-      />
+          {/* Project Grid / List */}
+          <motion.div 
+            layout
+            className={
+              viewMode === 'grid' 
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" 
+                : "flex flex-col gap-3"
+            }
+          >
+            <AnimatePresence mode="popLayout">
+              {mockProjects.map((project) => (
+                <ContextMenu key={project.id}>
+                  <motion.div
+                    layout
+                    layoutId={`project-${project.id}`}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                  >
+                    {viewMode === 'grid' ? (
+                      <ProjectCard project={project} />
+                    ) : (
+                      <ProjectListItem project={project} />
+                    )}
+                  </motion.div>
+                </ContextMenu>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        </div>
+      </div>
+      
+      <CreateProjectDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
     </div>
   );
 }
