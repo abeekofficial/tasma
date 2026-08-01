@@ -252,7 +252,7 @@ export function UploadQueuePanel() {
                               item.status === "paused" ? "bg-gray-400" : "bg-blue-500"
                             }`}
                             initial={{ width: 0 }}
-                            animate={{ width: \`\${item.progress}%\` }}
+                            animate={{ width: `${item.progress}%` }}
                             transition={{ duration: 0.5 }}
                           />
                         </div>

@@ -8,9 +8,13 @@ const invitationsRouter = Router();
 const apiKeysRouter = Router();
 
 // Import new modules
-import settingsRouter from './modules/settings/settings.routes';
-import subscriptionsRouter from './modules/subscriptions/subscriptions.routes';
-import paymentsRouter from './modules/payments/payments.routes';
+import settingsRouter from '../modules/settings/settings.routes';
+import subscriptionsRouter from '../modules/subscriptions/subscriptions.routes';
+import paymentsRouter from '../modules/payments/payments.routes';
+import projectsRouter from '../modules/projects/projects.routes';
+import mediaRouter from '../modules/media/media.routes';
+import templatesRouter from '../modules/templates/templates.routes';
+import timelineRouter from '../modules/timeline/timeline.routes';
 
 const apiRouter = Router();
 
@@ -24,5 +28,9 @@ apiRouter.use('/api-keys', apiKeysRouter);
 apiRouter.use('/settings', settingsRouter);
 apiRouter.use('/subscriptions', subscriptionsRouter);
 apiRouter.use('/payments', paymentsRouter);
+apiRouter.use('/projects', projectsRouter);
+apiRouter.use('/media', mediaRouter);
+apiRouter.use('/templates', templatesRouter);
+apiRouter.use('/timeline', timelineRouter);
 
 export default apiRouter;

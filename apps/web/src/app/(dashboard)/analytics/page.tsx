@@ -74,7 +74,7 @@ export default function AnalyticsPage() {
                   <div className="p-2 bg-zinc-800/50 rounded-lg">
                     <stat.icon className="w-5 h-5 text-zinc-400" />
                   </div>
-                  <span className={\`text-xs font-medium px-2 py-1 rounded-full \${stat.trendUp ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}\`}>
+                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${stat.trendUp ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
                     {stat.trend}
                   </span>
                 </div>

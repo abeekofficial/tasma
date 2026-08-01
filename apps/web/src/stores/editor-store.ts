@@ -109,6 +109,7 @@ export interface EditorStore {
   selectedClipIds: string[];
   clipboard: Clip[];
   boxSelection: { startX: number; startY: number; endX: number; endY: number } | null;
+  activeTool: string;
 
   // === Tracks ===
   tracks: Track[];
@@ -174,6 +175,7 @@ export interface EditorStore {
   selectAllClipsInTrack: (trackId: string) => void;
   clearSelection: () => void;
   setBoxSelection: (box: EditorStore['boxSelection']) => void;
+  setActiveTool: (tool: string) => void;
 
   // === Actions: Tracks ===
   addTrack: (type: TrackType, name?: string) => void;
@@ -278,6 +280,7 @@ export const useEditorStore = create<EditorStore>()(
     selectedClipIds: [],
     clipboard: [],
     boxSelection: null,
+    activeTool: 'selection' as string,
     tracks: [
       { id: crypto.randomUUID(), type: 'video', name: 'Video 1', isLocked: false, isVisible: true, isMuted: false, isSolo: false, volume: 1, height: 48, color: getTrackColor('video'), clips: [] },
       { id: crypto.randomUUID(), type: 'audio', name: 'Audio 1', isLocked: false, isVisible: true, isMuted: false, isSolo: false, volume: 1, height: 48, color: getTrackColor('audio'), clips: [] },
@@ -348,10 +351,11 @@ export const useEditorStore = create<EditorStore>()(
     }),
     clearSelection: () => set((state) => { state.selectedClipIds = []; state.selectedTrackId = null; }),
     setBoxSelection: (box) => set((state) => { state.boxSelection = box; }),
+    setActiveTool: (tool) => set((state) => { state.activeTool = tool; }),
 
     addTrack: (type, name) => set((state) => {
       get().pushHistory('Add Track');
-      const trackName = name || \`\${type.charAt(0).toUpperCase() + type.slice(1)} \${state.tracks.filter(t => t.type === type).length + 1}\`;
+      const trackName = name || `${type.charAt(0).toUpperCase() + type.slice(1)} ${state.tracks.filter(t => t.type === type).length + 1}`;
       state.tracks.push({ id: crypto.randomUUID(), type, name: trackName, isLocked: false, isVisible: true, isMuted: false, isSolo: false, volume: 1, height: 48, color: getTrackColor(type), clips: [] });
       state.isDirty = true;
     }),

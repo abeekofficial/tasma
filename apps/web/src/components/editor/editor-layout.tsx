@@ -5,6 +5,8 @@ import { cn } from '@/components/ui/button';
 import { EditorToolbar } from './toolbar/editor-toolbar';
 import { EditorSidebar } from './sidebar/editor-sidebar';
 import { StatusBar } from './status-bar';
+import { ContextToolbar } from './toolbar/context-toolbar';
+import { ShortcutManager } from './shortcuts/shortcut-manager';
 import { useEditor } from '@/hooks/use-editor-state';
 import { useResizablePanel } from '@/hooks/use-resizable-panel';
 import { TimelinePanel } from './timeline/timeline-panel';
@@ -31,7 +33,7 @@ export const EditorLayout = React.memo(() => {
   const panels = state?.panels || { sidebar: true, inspector: true, timeline: true, layers: false };
 
   return (
-    <div className="flex h-screen w-full flex-col bg-zinc-950 overflow-hidden text-zinc-100">
+    <div className="flex h-screen w-full flex-col relative bg-zinc-950 overflow-hidden text-zinc-100">
       <EditorToolbar />
       
       <div className="flex flex-1 overflow-hidden">
@@ -86,6 +88,8 @@ export const EditorLayout = React.memo(() => {
         )}
       </div>
       
+      <ContextToolbar />
+      <ShortcutManager />
       <StatusBar />
     </div>
   );

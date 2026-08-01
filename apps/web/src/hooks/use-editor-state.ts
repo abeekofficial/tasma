@@ -14,7 +14,7 @@ export function EditorProvider({ children, projectId }: { children: ReactNode; p
     }
   }, [projectId, setProjectMeta]);
 
-  return <>{children}</>;
+  return React.createElement(React.Fragment, null, children);
 }
 
 export function useEditor() {
