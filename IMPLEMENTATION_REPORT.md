@@ -34,10 +34,43 @@
 | Phase UI-7D — Inspector Panel| ✅ Complete | 13 | Accordion Sections, Drag-to-Scrub Inputs, Custom Controls |
 | **Phase UI-7E — Assets Browser**| **✅ Complete**| **7** | **Dual-pane Sidebar, Asset Cards, Grid/List Views** |
 | Phase UI-7F — Toolbar & Shortcuts | ✅ Complete | 6 | Top Toolbar, Playback, Editor Tools, Context Toolbar, Shortcuts |
+| **Phase 9.4A — Render Queue Foundation** | **✅ Complete** | **5** | **RenderJob CRUD, Queue Status, Retry/Cancel/Pause/Resume APIs** |
+| Phase 9.4B — Render Queue Services | ⏳ Not Started | ~5 est | Worker execution, scheduler, progress |
 | Phase 9.3 — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 363 files
+## Current File Count: 369 files
+
+## Phase 9.4A Deliverables (Render Queue Foundation)
+
+### Module: `apps/api/src/modules/render-queue/`
+| File | Purpose |
+|------|---------|
+| `render-queue.validators.ts` | Zod schemas for createRenderJob, updateJobStatus, listRenderJobs query, and retryRenderJob. Validates type, priority, status, format, resolution, codec, fps, quality, bitrate, metadata. |
+| `render-queue.repository.ts` | Prisma-backed repository with findById (includes logs), findMany (with filters, pagination, sorting), create, update, delete, createLog, findLogsByJobId, and countByStatus (aggregate). |
+| `render-queue.service.ts` | Business logic layer with createRenderJob (project access check, transaction with audit log), getRenderJob (ownership check), listRenderJobs, updateJobStatus (status transition timestamps), deleteRenderJob (guards active jobs), retryRenderJob (max retry check), cancelRenderJob, pauseRenderJob, resumeRenderJob, getJobLogs, getQueueStats. |
+| `render-queue.controller.ts` | Express static async handlers mapping HTTP requests to service methods with Zod validation. |
+| `render-queue.routes.ts` | Express Router with requireAuth, RESTful routes for all CRUD + action endpoints. |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `apps/api/src/routes/index.ts` | Added `import renderQueueRouter` and `apiRouter.use('/render-queue', renderQueueRouter)` |
+
+### REST API Endpoints (mounted at `/api/v1/render-queue`)
+| Method | Path | Action |
+|--------|------|--------|
+| `POST` | `/` | Create Render Job |
+| `GET` | `/` | List Jobs (with filters) |
+| `GET` | `/stats` | Get Queue Statistics |
+| `GET` | `/:jobId` | Get Render Job |
+| `PATCH` | `/:jobId/status` | Update Job Status |
+| `DELETE` | `/:jobId` | Delete Job |
+| `POST` | `/:jobId/retry` | Retry Job |
+| `POST` | `/:jobId/cancel` | Cancel Job |
+| `POST` | `/:jobId/pause` | Pause Job |
+| `POST` | `/:jobId/resume` | Resume Job |
+| `GET` | `/:jobId/logs` | Get Job Logs |
 
 ## Phase UI-7E Deliverables (Professional Assets Browser)
 

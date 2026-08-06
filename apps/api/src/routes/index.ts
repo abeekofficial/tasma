@@ -15,6 +15,7 @@ import projectsRouter from '../modules/projects/projects.routes';
 import mediaRouter from '../modules/media/media.routes';
 import templatesRouter from '../modules/templates/templates.routes';
 import timelineRouter from '../modules/timeline/timeline.routes';
+import renderQueueRouter from '../modules/render-queue/render-queue.routes';
 
 const apiRouter = Router();
 
@@ -32,5 +33,6 @@ apiRouter.use('/projects', projectsRouter);
 apiRouter.use('/media', mediaRouter);
 apiRouter.use('/templates', templatesRouter);
 apiRouter.use('/timeline', timelineRouter);
+apiRouter.use('/render-queue', renderQueueRouter);
 
 export default apiRouter;
