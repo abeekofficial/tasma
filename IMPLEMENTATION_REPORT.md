@@ -36,11 +36,30 @@
 | Phase UI-7F — Toolbar & Shortcuts | ✅ Complete | 6 | Top Toolbar, Playback, Editor Tools, Context Toolbar, Shortcuts |
 | **Phase 9.4A — Render Queue Foundation** | **✅ Complete** | **5** | **RenderJob CRUD, Queue Status, Retry/Cancel/Pause/Resume APIs** |
 | **Phase 9.4B — Render Queue Services** | **✅ Complete** | **7** | **QueueValidator, Statistics, Cleanup, Retry, Cancellation, PauseResume, QueueManager** |
-| Phase 9.4C — Worker Orchestrator | ⏳ Not Started | ~5 est | Worker execution orchestration |
+| **Phase 9.4C — Worker Orchestrator** | **✅ Complete** | **12** | **WorkerManager, Registry, Pool, Scheduler, Factory, Lifecycle, Heartbeat, Recovery, Health, Metrics, EventBus** |
+| Phase 9.4D — WebSocket Progress | ⏳ Not Started | ~5 est | WebSocket progress streaming & live events |
 | Phase 9.3 — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 376 files
+## Current File Count: 388 files
+
+## Phase 9.4C Deliverables (Worker Orchestrator)
+
+### New Module: `apps/api/src/modules/worker-orchestrator/`
+| File | Purpose |
+|------|---------|
+| `worker.types.ts` | Shared types: WorkerState, WorkerInfo, WorkerConfig, WorkerMetrics, JobAssignment, WorkerEvent, WorkerEventType, WorkerLease, WorkerHealthReport, PoolStatus |
+| `worker-event-bus.ts` | Typed event bus on Node.js EventEmitter with history tracking, type-safe emit/on/off/once |
+| `worker-registry.ts` | In-memory worker registry with registration, discovery, state updates, heartbeat tracking |
+| `worker-pool.ts` | Worker capacity management with locking, leasing, acquisition, and pool status aggregation |
+| `worker-scheduler.ts` | Job assignment engine with priority scheduling, claim/release/requeue, pending queue with auto-processing |
+| `worker-factory.ts` | Worker creation with defaults, pool creation, and specialized single-capability workers |
+| `worker-lifecycle.service.ts` | Start/stop/pause/resume/restart, graceful shutdown, failure marking, shutdown callbacks |
+| `worker-heartbeat.service.ts` | Heartbeat recording, configurable timeouts, periodic monitoring, stale worker detection |
+| `worker-recovery.service.ts` | Failed/offline worker recovery, stale heartbeat recovery, expired lease handling, orphaned job requeuing |
+| `worker-health.service.ts` | Per-worker health reports, pool health aggregation, system health check |
+| `worker-metrics.service.ts` | Per-worker metrics tracking (jobs processed/completed/failed, avg duration, CPU/memory), aggregate metrics |
+| `worker-manager.ts` | Central orchestrator facade composing all subsystems with initialization, shutdown, and automated event wiring |
 
 ## Phase 9.4B Deliverables (Render Queue Services)
 

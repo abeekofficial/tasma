@@ -1,18 +1,20 @@
 ## Next Task
 
-**Phase 9.4C — Worker Orchestrator**
+**Phase 9.4D — WebSocket Progress & Live Events**
 
 ### Resume Point
-Phase 9.4B (Render Queue Services) is fully complete.
-The `apps/api/src/modules/render-queue/` module now contains 12 files:
-- Foundation: validators, repository, service, controller, routes
-- Services: QueueValidator, QueueStatisticsService, QueueCleanupService, QueueRetryService, QueueCancellationService, QueuePauseResumeService, QueueManager
+Phase 9.4C (Worker Orchestrator) is fully complete.
+The `apps/api/src/modules/worker-orchestrator/` module now contains 12 files:
+- Types, EventBus, Registry, Pool, Scheduler, Factory
+- Lifecycle, Heartbeat, Recovery, Health, Metrics services
+- Central WorkerManager orchestrator
 
-### Phase 9.4C — Worker Orchestrator
-- Implement Worker Orchestrator for render queue execution
+### Phase 9.4D — WebSocket Progress & Live Events
+- Implement WebSocket server for real-time progress streaming
+- Implement live event broadcasting for render queue status updates
 
 ### Last Completed File
-`apps/api/src/modules/render-queue/queue-manager.ts`
+`apps/api/src/modules/worker-orchestrator/worker-manager.ts`
 
 ### Do Not Regenerate
-Everything in phases 1-9.2, UI-1 through UI-7F, Phase 9.4A, and Phase 9.4B (376 files already complete).
+Everything in phases 1-9.2, UI-1 through UI-7F, Phase 9.4A, 9.4B, and 9.4C (388 files already complete).
