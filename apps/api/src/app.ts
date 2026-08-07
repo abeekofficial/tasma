@@ -23,17 +23,13 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Mount Better Auth handler
 app.all('/api/auth/*', toExpressHandler(auth));
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-  });
-});
+import monitoringRouter from './modules/monitoring/monitoring.routes';
 
 // Mount API routes
 app.use('/api/v1', apiRouter);
+
+// Mount top-level monitoring routes (/health, /metrics, etc.)
+app.use('/', monitoringRouter);
 
 // Apply not found handler
 app.use(notFoundHandler);

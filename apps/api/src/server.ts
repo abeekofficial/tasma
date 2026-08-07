@@ -3,6 +3,7 @@ import { app } from './app';
 import { prisma } from './lib/prisma';
 import { redisClient } from './lib/redis';
 import { webSocketManager } from './modules/websocket/websocket-manager';
+import { monitoringManager } from './modules/monitoring/monitoring-manager';
 
 async function startServer() {
   try {
@@ -21,6 +22,9 @@ async function startServer() {
     // Initialize WebSocket server
     webSocketManager.initialize(server);
 
+    // Start Monitoring Subsystems
+    monitoringManager.startAll();
+
     // Graceful shutdown handler
     const gracefulShutdown = async (signal: string) => {
       console.log(`${signal} received, shutting down gracefully...`);
@@ -31,6 +35,9 @@ async function startServer() {
       });
 
       try {
+        // Stop Monitoring Subsystems
+        monitoringManager.stopAll();
+
         // Shutdown WebSocket server
         webSocketManager.shutdown();
 
