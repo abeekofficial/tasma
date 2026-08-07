@@ -43,3 +43,55 @@ export const retryRenderJobSchema = z.object({
   resetProgress: z.boolean().optional().default(true),
   priority: z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT']).optional(),
 });
+
+export const batchJobIdsSchema = z.object({
+  jobIds: z.array(z.string().uuid()).min(1).max(100),
+  reason: z.string().max(500).optional(),
+});
+
+export const batchRetrySchema = z.object({
+  jobIds: z.array(z.string().uuid()).min(1).max(100),
+  resetProgress: z.boolean().optional().default(true),
+  priority: z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT']).optional(),
+});
+
+export const searchRenderJobsSchema = z.object({
+  search: z.string().optional(),
+  projectId: z.string().uuid().optional(),
+  status: z.enum([
+    'QUEUED', 'ASSIGNED', 'PROCESSING', 'ENCODING',
+    'UPLOADING', 'COMPLETED', 'FAILED', 'CANCELLED', 'TIMED_OUT',
+  ]).optional(),
+  type: z.enum(['PREVIEW', 'EXPORT', 'THUMBNAIL', 'SOCIAL_PUBLISH']).optional(),
+  priority: z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT']).optional(),
+  dateFrom: z.string().datetime().optional(),
+  dateTo: z.string().datetime().optional(),
+  page: z.string().regex(/^\d+$/).transform(Number).optional(),
+  limit: z.string().regex(/^\d+$/).transform(Number).optional(),
+  sortBy: z.enum(['createdAt', 'updatedAt', 'priority', 'status']).optional(),
+  sortOrder: z.enum(['asc', 'desc']).optional(),
+});
+
+export const updatePrioritySchema = z.object({
+  priority: z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT']),
+});
+
+export const cleanupSchema = z.object({
+  olderThanDays: z.number().int().min(1).max(365).optional().default(30),
+  statuses: z.array(z.enum(['COMPLETED', 'FAILED', 'CANCELLED', 'TIMED_OUT'])).optional(),
+  dryRun: z.boolean().optional().default(false),
+  limit: z.number().int().min(1).max(1000).optional().default(500),
+});
+
+export const projectActionSchema = z.object({
+  projectId: z.string().uuid(),
+  reason: z.string().max(500).optional(),
+});
+
+export const trendsQuerySchema = z.object({
+  days: z.string().regex(/^\d+$/).transform(Number).pipe(z.number().int().min(1).max(365)).optional(),
+});
+
+export const waitTimeQuerySchema = z.object({
+  priority: z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT']).optional().default('NORMAL'),
+});

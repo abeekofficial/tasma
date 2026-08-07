@@ -35,13 +35,52 @@
 | **Phase UI-7E — Assets Browser**| **✅ Complete**| **7** | **Dual-pane Sidebar, Asset Cards, Grid/List Views** |
 | Phase UI-7F — Toolbar & Shortcuts | ✅ Complete | 6 | Top Toolbar, Playback, Editor Tools, Context Toolbar, Shortcuts |
 | **Phase 9.4A — Render Queue Foundation** | **✅ Complete** | **5** | **RenderJob CRUD, Queue Status, Retry/Cancel/Pause/Resume APIs** |
-| Phase 9.4B — Render Queue Services | ⏳ Not Started | ~5 est | Worker execution, scheduler, progress |
+| **Phase 9.4B — Render Queue Services** | **✅ Complete** | **7** | **QueueValidator, Statistics, Cleanup, Retry, Cancellation, PauseResume, QueueManager** |
+| Phase 9.4C — Worker Orchestrator | ⏳ Not Started | ~5 est | Worker execution orchestration |
 | Phase 9.3 — Backend CRUD Modules | ⏳ Not Started | ~17 est | Projects, Media, Templates, Timeline APIs |
 | Phase 10 — DevOps | ⏳ Not Started | ~15 est | Docker, CI/CD |
 
-## Current File Count: 369 files
+## Current File Count: 376 files
 
-## Phase 9.4A Deliverables (Render Queue Foundation)
+## Phase 9.4B Deliverables (Render Queue Services)
+
+### New Service Files: `apps/api/src/modules/render-queue/`
+| File | Purpose |
+|------|---------|
+| `queue-validator.ts` | Centralized business rules — status transition matrix, retry eligibility, cancellation/pause/resume rules, priority validation, duplicate job prevention. |
+| `queue-statistics.service.ts` | Advanced analytics — queue overview (status/priority/type breakdowns, success/failure rates), daily trends, project-scoped stats, wait time estimation. |
+| `queue-cleanup.service.ts` | Automated maintenance — completed job cleanup with retention policy, orphaned log cleanup, stale job detection, timeout enforcement, cleanup preview. |
+| `queue-retry.service.ts` | Dedicated retry operations — single retry with exponential backoff, batch retry, auto-retry for all failed jobs below retry limit. |
+| `queue-cancellation.service.ts` | Cancellation operations — single cancel, batch cancel, project-wide cancellation with cascading audit logs. |
+| `queue-pause-resume.service.ts` | Pause/Resume operations — single pause/resume with metadata tracking, batch pause/resume, project-wide pause with reason tracking. |
+| `queue-manager.ts` | Central orchestrator — composes all specialized services, adds duplicate job prevention, advanced search with text/date filters, priority management, queue health checks. |
+
+### Modified Files
+| File | Change |
+|------|--------|
+| `render-queue.validators.ts` | Extended with batch, search, priority, cleanup, project action, trends, and wait time schemas |
+| `render-queue.controller.ts` | Replaced with expanded version adding 15 new endpoint handlers |
+| `render-queue.routes.ts` | Expanded with batch, project-wide, search, statistics, health, cleanup routes |
+
+### New REST API Endpoints (mounted at `/api/v1/render-queue`)
+| Method | Path | Action |
+|--------|------|--------|
+| `GET` | `/overview` | Comprehensive queue statistics |
+| `GET` | `/trends` | Daily trend data |
+| `GET` | `/health` | Queue health check |
+| `GET` | `/wait-time` | Estimated wait time |
+| `GET` | `/search` | Advanced job search |
+| `GET` | `/cleanup/preview` | Cleanup preview |
+| `POST` | `/cleanup` | Execute job cleanup |
+| `POST` | `/cleanup/timeout` | Timeout stale jobs |
+| `POST` | `/auto-retry` | Auto-retry all failed jobs |
+| `POST` | `/batch/cancel` | Batch cancel jobs |
+| `POST` | `/batch/retry` | Batch retry jobs |
+| `POST` | `/batch/pause` | Batch pause jobs |
+| `POST` | `/batch/resume` | Batch resume jobs |
+| `POST` | `/project/cancel` | Cancel all for project |
+| `POST` | `/project/pause` | Pause all for project |
+| `PATCH` | `/:jobId/priority` | Update job priority |
 
 ### Module: `apps/api/src/modules/render-queue/`
 | File | Purpose |
