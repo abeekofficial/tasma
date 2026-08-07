@@ -2,6 +2,7 @@ import { env } from './config/env';
 import { app } from './app';
 import { prisma } from './lib/prisma';
 import { redisClient } from './lib/redis';
+import { webSocketManager } from './modules/websocket/websocket-manager';
 
 async function startServer() {
   try {
@@ -17,6 +18,9 @@ async function startServer() {
       console.log(`Server is running on port ${env.PORT} in ${env.NODE_ENV} mode`);
     });
 
+    // Initialize WebSocket server
+    webSocketManager.initialize(server);
+
     // Graceful shutdown handler
     const gracefulShutdown = async (signal: string) => {
       console.log(`${signal} received, shutting down gracefully...`);
@@ -27,6 +31,9 @@ async function startServer() {
       });
 
       try {
+        // Shutdown WebSocket server
+        webSocketManager.shutdown();
+
         await prisma.$disconnect();
         console.log('Prisma disconnected');
         
