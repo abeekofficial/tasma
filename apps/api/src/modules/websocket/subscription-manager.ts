@@ -24,8 +24,8 @@ export class SubscriptionManager {
    * @throws {AppError} If the channel does not exist.
    */
   public subscribe(clientId: string, channelName: string): void {
-    if (!this.channelMgr.getChannel(channelName)) {
-      throw new AppError('NOT_FOUND', `Channel not found: ${channelName}`);
+    if (!this.channelMgr.isValidChannel(channelName)) {
+      throw new AppError('NOT_FOUND', `Channel not found or invalid: ${channelName}`);
     }
 
     if (!this.subscriptionsByClient.has(clientId)) {
@@ -111,6 +111,29 @@ export class SubscriptionManager {
   public hasSubscription(clientId: string, channelName: string): boolean {
     const channels = this.subscriptionsByClient.get(clientId);
     return channels ? channels.has(channelName) : false;
+  }
+
+  /**
+   * Aggressively cleans up any orphaned clients or channels to prevent memory leaks.
+   */
+  public cleanupOrphans(): number {
+    let orphansRemoved = 0;
+    
+    for (const [clientId, channels] of this.subscriptionsByClient.entries()) {
+      if (channels.size === 0) {
+        this.subscriptionsByClient.delete(clientId);
+        orphansRemoved++;
+      }
+    }
+
+    for (const [channelName, clients] of this.clientsByChannel.entries()) {
+      if (clients.size === 0) {
+        this.clientsByChannel.delete(channelName);
+        orphansRemoved++;
+      }
+    }
+
+    return orphansRemoved;
   }
 }
 

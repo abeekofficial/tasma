@@ -51,15 +51,15 @@ export class ProgressBroadcaster {
     const messageString = JSON.stringify(message);
 
     for (const clientId of targetClientIds) {
-      const ws = this.connectionManager.getConnection(clientId);
-      if (ws) {
+      const conn = this.connectionManager.getConnection(clientId);
+      if (conn && conn.ws) {
         // Check readyState if available (1 corresponds to WebSocket.OPEN)
-        if (typeof ws.readyState === 'number') {
-          if (ws.readyState === 1) {
-            ws.send(messageString);
+        if (typeof conn.ws.readyState === 'number') {
+          if (conn.ws.readyState === 1) {
+            conn.ws.send(messageString);
           }
         } else {
-          ws.send(messageString);
+          conn.ws.send(messageString);
         }
       }
     }

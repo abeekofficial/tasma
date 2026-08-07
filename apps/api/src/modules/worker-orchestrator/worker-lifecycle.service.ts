@@ -201,7 +201,18 @@ export class WorkerLifecycleService {
 
     const callback = this.shutdownCallbacks.get(workerId);
     if (callback) {
-      await callback();
+      try {
+        // Enforce a maximum timeout for graceful shutdown to prevent hanging
+        const timeoutMs = 15000;
+        await Promise.race([
+          callback(),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error(`Shutdown callback timed out after ${timeoutMs}ms`)), timeoutMs)
+          )
+        ]);
+      } catch (err) {
+        console.error(`[WorkerLifecycleService] Worker '${workerId}' graceful shutdown failed:`, err);
+      }
     }
 
     return this.registry.updateState(workerId, 'OFFLINE');

@@ -25,11 +25,12 @@ export class NotificationDispatcher {
    */
   public broadcastToWorkspace(workspaceId: string, payload: SystemNotificationPayload): void {
     const channel = `workspace:${workspaceId}`;
-    const clients = this.subManager.getClientsForChannel(channel);
+    const clients = this.subManager.getChannelClients(channel);
     const message: WebSocketMessage = { type: 'SYSTEM_NOTIFICATION', payload };
 
     for (const clientId of clients) {
-      this.connManager.sendMessage(clientId, message);
+      const conn = this.connManager.getConnection(clientId);
+      if (conn?.ws?.readyState === 1) conn.ws.send(JSON.stringify(message));
     }
   }
 
@@ -41,11 +42,12 @@ export class NotificationDispatcher {
    */
   public broadcastToUser(userId: string, payload: SystemNotificationPayload): void {
     const channel = `user:${userId}`;
-    const clients = this.subManager.getClientsForChannel(channel);
+    const clients = this.subManager.getChannelClients(channel);
     const message: WebSocketMessage = { type: 'SYSTEM_NOTIFICATION', payload };
 
     for (const clientId of clients) {
-      this.connManager.sendMessage(clientId, message);
+      const conn = this.connManager.getConnection(clientId);
+      if (conn?.ws?.readyState === 1) conn.ws.send(JSON.stringify(message));
     }
   }
 
@@ -56,11 +58,12 @@ export class NotificationDispatcher {
    */
   public broadcastToAdmin(payload: SystemNotificationPayload): void {
     const channel = 'admin:system';
-    const clients = this.subManager.getClientsForChannel(channel);
+    const clients = this.subManager.getChannelClients(channel);
     const message: WebSocketMessage = { type: 'SYSTEM_NOTIFICATION', payload };
 
     for (const clientId of clients) {
-      this.connManager.sendMessage(clientId, message);
+      const conn = this.connManager.getConnection(clientId);
+      if (conn?.ws?.readyState === 1) conn.ws.send(JSON.stringify(message));
     }
   }
 }

@@ -1,19 +1,20 @@
 ## Next Task
 
-**Phase 9.4F — Validation, Integration Tests & Production Hardening**
+**Sprint D: Phase 9.5 — AI Studio Backend**
 
 ### Resume Point
-Phase 9.4E (Monitoring & Metrics) is fully complete.
-The `apps/api/src/modules/monitoring/` module now contains 13 files representing a self-contained monitoring and health check subsystem. 
-Top-level diagnostic routes are mounted on the Express server (`/health`, `/metrics`, `/diagnostics`, `/system/status`).
+Phase 9.4F (Validation, Integration Tests & Production Hardening) is fully complete.
+The Render Queue infrastructure has been validated and hardened. Test suites (`worker-orchestrator.test.ts`, `render-queue.test.ts`, `websocket-layer.test.ts`, `monitoring.test.ts`) were added.
+Hardening applied to:
+- `worker-lifecycle.service.ts` (Graceful shutdown timeouts)
+- `queue-manager.ts` (Race condition protection with optimistic concurrency)
+- `subscription-manager.ts` (Aggressive resource cleanup)
 
-### Phase 9.4F — Validation, Integration Tests & Production Hardening
-- Implement integration tests for the full worker and orchestrator lifecycle.
-- Harden the render queue services.
-- Final validation of all backend subsystems before DevOps deployment.
+### Phase 9.5 — AI Studio Backend
+- Begin backend systems for AI Studio interactions (AI Job execution).
 
 ### Last Completed File
-`apps/api/src/modules/monitoring/monitoring.routes.ts`
+`apps/api/tests/integration/monitoring.test.ts`
 
 ### Do Not Regenerate
-Everything in phases 1-9.2, UI-1 through UI-7F, and Phase 9.4A through 9.4E (412 files already complete).
+Everything in phases 1-9.2, UI-1 through UI-7F, and Phase 9.4A through 9.4F (416 files already complete).

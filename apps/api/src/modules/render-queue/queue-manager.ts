@@ -243,9 +243,19 @@ export class QueueManager {
     }
 
     const updated = await this.prisma.$transaction(async (tx) => {
-      const updatedJob = await tx.renderJob.update({
-        where: { id: jobId },
+      // Use optimistic concurrency control to prevent race conditions
+      const updatedJobBatch = await tx.renderJob.updateMany({
+        where: { id: jobId, status: job.status },
         data: updatePayload,
+      });
+
+      if (updatedJobBatch.count === 0) {
+        throw AppError.conflict('Job status changed concurrently. Please try again.');
+      }
+
+      // Fetch the actual updated job
+      const updatedJob = await tx.renderJob.findUniqueOrThrow({
+        where: { id: jobId }
       });
 
       await tx.renderJobLog.create({
