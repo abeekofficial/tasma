@@ -2,17 +2,20 @@ import { Request, Response, NextFunction } from 'express';
 import { ScriptGenerator } from './services/script.generator';
 import { PlannerGenerator } from './services/planner.generator';
 import { SubtitleGenerator } from './services/subtitle.generator';
+import { ElevenLabsProvider } from './providers/elevenlabs.provider';
 import { AIProvider } from './ai.module';
 
 export class AIController {
   private scriptGenerator: ScriptGenerator;
   private plannerGenerator: PlannerGenerator;
   private subtitleGenerator: SubtitleGenerator;
+  private elevenLabsProvider: ElevenLabsProvider;
 
   constructor() {
     this.scriptGenerator = new ScriptGenerator();
     this.plannerGenerator = new PlannerGenerator();
     this.subtitleGenerator = new SubtitleGenerator();
+    this.elevenLabsProvider = new ElevenLabsProvider();
   }
 
   public generateScript = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -24,7 +27,7 @@ export class AIController {
         return;
       }
 
-      const streamResult = await this.scriptGenerator.generateScript(
+      const result = await this.scriptGenerator.generateScript(
         topic,
         length as 'short' | 'medium' | 'long',
         tone,
@@ -32,7 +35,29 @@ export class AIController {
         modelName
       );
 
-      streamResult.pipeTextStreamToResponse(res);
+      res.status(200).json(result.object);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public generateVoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { text, voiceId } = req.body;
+
+      if (!text || !voiceId) {
+        res.status(400).json({ error: 'Missing required parameters: text, voiceId.' });
+        return;
+      }
+
+      const audioBuffer = await this.elevenLabsProvider.generateSpeech({ text, voiceId });
+      
+      res.set({
+        'Content-Type': 'audio/mpeg',
+        'Content-Length': audioBuffer.byteLength,
+      });
+      
+      res.status(200).send(Buffer.from(audioBuffer));
     } catch (error) {
       next(error);
     }

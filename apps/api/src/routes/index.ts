@@ -16,6 +16,7 @@ import mediaRouter from '../modules/media/media.routes';
 import templatesRouter from '../modules/templates/templates.routes';
 import timelineRouter from '../modules/timeline/timeline.routes';
 import renderQueueRouter from '../modules/render-queue/render-queue.routes';
+import { aiRoutes } from '../modules/ai/ai.routes';
 
 const apiRouter = Router();
 
@@ -34,5 +35,6 @@ apiRouter.use('/media', mediaRouter);
 apiRouter.use('/templates', templatesRouter);
 apiRouter.use('/timeline', timelineRouter);
 apiRouter.use('/render-queue', renderQueueRouter);
+apiRouter.use('/ai', aiRoutes);
 
 export default apiRouter;

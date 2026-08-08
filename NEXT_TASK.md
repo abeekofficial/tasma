@@ -1,20 +1,17 @@
 ## Next Task
 
-**Sprint D: Phase 9.5 — AI Studio Backend**
+**MVP-3: Render Orchestration & Output**
 
 ### Resume Point
-Phase 9.4F (Validation, Integration Tests & Production Hardening) is fully complete.
-The Render Queue infrastructure has been validated and hardened. Test suites (`worker-orchestrator.test.ts`, `render-queue.test.ts`, `websocket-layer.test.ts`, `monitoring.test.ts`) were added.
-Hardening applied to:
-- `worker-lifecycle.service.ts` (Graceful shutdown timeouts)
-- `queue-manager.ts` (Race condition protection with optimistic concurrency)
-- `subscription-manager.ts` (Aggressive resource cleanup)
+MVP-2 (Dashboard & Template Experience) is 100% complete. We successfully wired up the Create Short UI wizard. The template API is live. The AI Generator returns structured JSON script scenes. The ElevenLabs API handles voice synthesis. The UI incorporates the `UploadZone` and `VideoPreview`. The final step successfully calls `/api/v1/projects` and `/api/v1/render-queue/jobs` to kick off the render process.
 
-### Phase 9.5 — AI Studio Backend
-- Begin backend systems for AI Studio interactions (AI Job execution).
+### MVP-3 — Render Orchestration & Output
+- Finalize the Render Queue WebSocket connection in the Create Short wizard to listen for live progress events.
+- Display the final downloadable MP4 URL upon job completion.
+- Ensure all worker orchestration processes properly pick up the API-submitted render job.
 
 ### Last Completed File
-`apps/api/tests/integration/monitoring.test.ts`
+`apps/web/src/app/(dashboard)/create/page.tsx`
 
 ### Do Not Regenerate
-Everything in phases 1-9.2, UI-1 through UI-7F, and Phase 9.4A through 9.4F (416 files already complete).
+Everything from earlier phases, including enterprise modules.

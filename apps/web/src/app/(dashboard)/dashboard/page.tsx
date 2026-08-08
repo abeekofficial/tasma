@@ -3,6 +3,7 @@
 import { useSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Plus, Upload, Video, Wand2, Settings } from "lucide-react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { StatsCard } from "@/components/dashboard/stats-card";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
@@ -10,10 +11,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 
 const MOCK_STATS = [
-  { label: "AI Credits", value: "4,250", trend: "+12.5%", trendUp: true },
-  { label: "Storage", value: "14.2 GB", trend: "+2.1%", trendUp: false },
-  { label: "Render Time", value: "3h 42m", trend: "-15%", trendUp: true },
-  { label: "Active Projects", value: "8", trend: "+2", trendUp: true },
+  { label: "Videos Created", value: "12", trend: "+3", trendUp: true },
+  { label: "Templates Used", value: "4", trend: "+1", trendUp: true },
+  { label: "Recent Renders", value: "8", trend: "+2", trendUp: true },
+  { label: "Storage Used", value: "1.2 GB", trend: "+0.1 GB", trendUp: false },
 ];
 
 const MOCK_PROJECTS = [
@@ -70,10 +71,12 @@ export default function DashboardPage() {
             <Upload className="w-4 h-4" />
             Upload
           </Button>
-          <Button className="gap-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.3)]">
-            <Plus className="w-4 h-4" />
-            New Project
-          </Button>
+          <Link href="/create">
+            <Button className="gap-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+              <Plus className="w-4 h-4" />
+              Create Short
+            </Button>
+          </Link>
         </div>
       </motion.div>
 

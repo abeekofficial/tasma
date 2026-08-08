@@ -9,22 +9,24 @@ import {
   Image as ImageIcon, 
   Sparkles, 
   Settings,
-  Menu
+  Menu,
+  Plus
 } from "lucide-react";
 import { cn } from "../ui/button";
 import { useSession } from "@/lib/auth-client";
 import { Avatar } from "../ui/avatar";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen: boolean, setMobileOpen: (v: boolean) => void }) {
   const pathname = usePathname();
   const { data } = useSession();
 
   const navItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/projects", label: "Projects", icon: Video },
-    { href: "/templates", label: "Templates", icon: LayoutTemplate },
-    { href: "/media", label: "Media Library", icon: ImageIcon },
-    { href: "/ai-studio", label: "AI Studio", icon: Sparkles },
+    ...(isFeatureEnabled("dashboard") ? [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }] : []),
+    ...(isFeatureEnabled("projectManagement") ? [{ href: "/projects", label: "Projects", icon: Video }] : []),
+    ...(isFeatureEnabled("templateGallery") ? [{ href: "/templates", label: "Templates", icon: LayoutTemplate }] : []),
+    ...(isFeatureEnabled("mediaUpload") ? [{ href: "/media", label: "Media Library", icon: ImageIcon }] : []),
+    ...(isFeatureEnabled("aiStudio") ? [{ href: "/ai-studio", label: "AI Studio", icon: Sparkles }] : []),
   ];
 
   return (
@@ -49,6 +51,18 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen: boolean, se
         </div>
 
         <div className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+          {isFeatureEnabled("createShort") && (
+            <div className="pb-4 mb-4 border-b border-zinc-800/50">
+              <Link
+                href="/create"
+                className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-semibold bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white shadow-[0_0_15px_rgba(139,92,246,0.2)] transition-all hover:scale-[1.02]"
+              >
+                <Plus className="w-4 h-4" />
+                Create Short
+              </Link>
+            </div>
+          )}
+
           {navItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
             return (

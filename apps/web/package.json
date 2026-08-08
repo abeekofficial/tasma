@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/react": "^4.0.61",
+    "ai": "^7.0.58",
     "better-auth": "^1.2.0",
     "clsx": "^2.1.0",
     "framer-motion": "^12.43.0",

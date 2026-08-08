@@ -8,22 +8,51 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SkeletonCard } from '@/components/ui/skeleton';
 
-const CATEGORIES = ['All', 'Reddit Story', 'Top List', 'Podcast Clip', 'Product Showcase', 'Tutorial', 'News', 'Custom'];
+import { api } from '@/lib/api';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
-const MOCK_TEMPLATES = [
-  { id: '1', name: 'Reddit Story Minimal', category: 'Reddit Story', platform: 'TikTok', rating: 4.8, uses: '12k', color: 'from-orange-500 to-red-500' },
-  { id: '2', name: 'Top 5 Tech Gadgets', category: 'Top List', platform: 'YouTube Shorts', rating: 4.9, uses: '8.5k', color: 'from-blue-500 to-cyan-500' },
-  { id: '3', name: 'Podcast Split Screen', category: 'Podcast Clip', platform: 'Instagram Reels', rating: 4.7, uses: '15k', color: 'from-violet-500 to-purple-500' },
-  { id: '4', name: 'Viral News Flash', category: 'News', platform: 'TikTok', rating: 4.6, uses: '5k', color: 'from-emerald-500 to-teal-500' },
-  { id: '5', name: 'Product Reveal Pro', category: 'Product Showcase', platform: 'Instagram Reels', rating: 4.9, uses: '22k', color: 'from-pink-500 to-rose-500' },
-];
+const CATEGORIES = ['All', 'Motivation', 'Facts', 'Story', 'News', 'Education', 'Business', 'Islamic', 'General Shorts'];
+
+interface Template {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  isPublic: boolean;
+  metadata?: {
+    platform?: string;
+    color?: string;
+    rating?: number;
+    uses?: string;
+  };
+}
 
 export default function TemplatesPage() {
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('All');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const router = useRouter();
 
-  const filteredTemplates = MOCK_TEMPLATES.filter(t => {
+  React.useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        setLoading(true);
+        const res = await api.get('/templates?isPublic=true');
+        if (res.data?.success && Array.isArray(res.data.data?.data)) {
+          setTemplates(res.data.data.data);
+        }
+      } catch (err) {
+        toast.error('Failed to load templates');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTemplates();
+  }, []);
+
+  const filteredTemplates = templates.filter(t => {
     const matchesSearch = t.name.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = activeTab === 'All' || t.category === activeTab;
     return matchesSearch && matchesCategory;
@@ -66,7 +95,7 @@ export default function TemplatesPage() {
                 <Badge variant="secondary" className="w-fit mb-3 bg-violet-500/20 text-violet-300">New Trending</Badge>
                 <h3 className="text-2xl font-bold text-zinc-100 mb-2">Dynamic Storyteller</h3>
                 <p className="text-zinc-400 text-sm mb-6 line-clamp-2">Perfect for Reddit stories with dynamic auto-captions and background gameplay.</p>
-                <Button className="w-full">Use Template</Button>
+                <Button className="w-full" onClick={() => router.push('/create?templateId=trending')}>Use Template</Button>
               </div>
             </div>
           </div>
@@ -98,10 +127,10 @@ export default function TemplatesPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredTemplates.map(template => (
                   <div key={template.id} className="glass rounded-xl border border-zinc-800/60 overflow-hidden group hover:border-violet-500/50 transition-colors flex flex-col">
-                    <div className={`h-40 bg-gradient-to-br ${template.color} relative`}>
+                    <div className={`h-40 bg-gradient-to-br ${template.metadata?.color || 'from-violet-500 to-purple-500'} relative`}>
                       <div className="absolute inset-0 bg-black/10" />
                       <div className="absolute top-3 right-3">
-                        <Badge className="bg-black/40 backdrop-blur-md text-white border-none">{template.platform}</Badge>
+                        <Badge className="bg-black/40 backdrop-blur-md text-white border-none">{template.metadata?.platform || 'YouTube Shorts'}</Badge>
                       </div>
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 backdrop-blur-sm">
                         <Button variant="secondary" size="sm" className="rounded-full">
@@ -113,20 +142,24 @@ export default function TemplatesPage() {
                       <div className="flex justify-between items-start mb-1">
                         <h3 className="font-semibold text-zinc-100 truncate pr-2">{template.name}</h3>
                       </div>
-                      <p className="text-xs text-zinc-500 mb-4">{template.category}</p>
+                      <p className="text-xs text-zinc-500 mb-4">{template.category || 'General'}</p>
                       
                       <div className="mt-auto flex items-center justify-between text-xs text-zinc-400 mb-4">
                         <div className="flex items-center">
                           <Star className="w-3 h-3 text-amber-500 mr-1 fill-amber-500" />
-                          {template.rating}
+                          {template.metadata?.rating || 4.8}
                         </div>
                         <div className="flex items-center">
                           <Copy className="w-3 h-3 mr-1" />
-                          {template.uses} uses
+                          {template.metadata?.uses || '10k+'} uses
                         </div>
                       </div>
                       
-                      <Button variant="outline" className="w-full hover:bg-violet-600 hover:text-white hover:border-violet-600 transition-colors">
+                      <Button 
+                        variant="outline" 
+                        className="w-full hover:bg-violet-600 hover:text-white hover:border-violet-600 transition-colors"
+                        onClick={() => router.push(`/create?templateId=${template.id}`)}
+                      >
                         Use Template
                       </Button>
                     </div>
